@@ -237,6 +237,41 @@
     @media (max-width: 500px) {
       .choices { grid-template-columns: 1fr; }
     }
+
+    .search-wrap {
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      background: var(--card);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.95rem;
+      color: var(--ink);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -248,7 +283,12 @@
 
 <div id="top-page">
   <div class="section-label">クイズを選ぶ</div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search-input" type="text" placeholder="アニメ名で検索（例：鬼滅、ナルト…）" oninput="filterQuiz()" />
+  </div>
   <div class="quiz-grid" id="quiz-grid"></div>
+  <div class="no-results" id="no-results">「<span id="no-results-word"></span>」に一致するクイズが見つかりませんでした😢</div>
 </div>
 
 <div id="quiz-page">
@@ -559,6 +599,31 @@ function showResult() {
 
 function retryQuiz() { startQuiz(currentQuiz.id); }
 function goTop() { showPage('top'); }
+
+function filterQuiz() {
+  const word = document.getElementById('search-input').value.trim().toLowerCase();
+  const grid = document.getElementById('quiz-grid');
+  const noResults = document.getElementById('no-results');
+  const noResultsWord = document.getElementById('no-results-word');
+
+  const filtered = quizData.filter(q => q.title.toLowerCase().includes(word));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noResultsWord.textContent = word;
+    noResults.style.display = 'block';
+  } else {
+    noResults.style.display = 'none';
+    grid.innerHTML = filtered.map(q => `
+      <div class="quiz-card" onclick="startQuiz('${q.id}')">
+        <div class="card-emoji">${q.emoji}</div>
+        <div class="card-title">${q.title}</div>
+        <div class="card-meta">${q.questions.length}問</div>
+        <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
+      </div>
+    `).join('');
+  }
+}
 
 renderTop();
 showPage('top');

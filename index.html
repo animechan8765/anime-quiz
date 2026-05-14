@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>アニメクイズ道場</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1208;
+      --paper: #f5efe0;
+      --accent: #c0392b;
+      --accent2: #e67e22;
+      --gold: #d4a017;
+      --muted: #7a6a50;
+      --card: #fdf8ee;
+      --border: #c8b89a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(180,160,120,0.15) 39px, rgba(180,160,120,0.15) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(180,160,120,0.08) 39px, rgba(180,160,120,0.08) 40px);
+    }
+    header {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+    header::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: var(--accent);
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+    .site-title {
+      font-family: 'Zen Antique Soft', serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      color: var(--ink);
+      letter-spacing: 0.1em;
+      text-shadow: 3px 3px 0 rgba(192,57,43,0.15);
+    }
+    .site-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.2em;
+    }
+
+    /* TOP */
+    #top-page { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
+    .section-label {
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .quiz-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 24px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quiz-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px; height: 100%;
+      background: var(--accent);
+      transform: scaleY(0);
+      transition: transform 0.2s ease;
+      transform-origin: bottom;
+    }
+    .quiz-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 4px 6px 0 rgba(192,57,43,0.12); }
+    .quiz-card:hover::before { transform: scaleY(1); }
+    .card-emoji { font-size: 2.2rem; margin-bottom: 10px; }
+    .card-title { font-family: 'Zen Antique Soft', serif; font-size: 1.1rem; margin-bottom: 6px; }
+    .card-meta { font-size: 0.75rem; color: var(--muted); }
+    .card-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-top: 8px;
+      letter-spacing: 0.1em;
+    }
+    .card-badge.hard { background: var(--ink); }
+    .card-badge.easy { background: #27ae60; }
+
+    /* QUIZ */
+    #quiz-page { display: none; }
+    .quiz-container { max-width: 680px; margin: 0 auto; padding: 20px 20px 60px; }
+    .quiz-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .back-btn {
+      background: none;
+      border: 2px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: all 0.15s;
+    }
+    .back-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .quiz-title-bar { font-family: 'Zen Antique Soft', serif; font-size: 1.1rem; }
+    .progress-wrap { margin-bottom: 32px; }
+    .progress-text { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .question-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 32px 28px;
+      margin-bottom: 20px;
+    }
+    .question-number { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 12px; font-weight: 700; }
+    .question-text { font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 1.7; font-weight: 700; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .choice-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 16px;
+      text-align: left;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      transition: all 0.15s;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: #fff8f0; }
+    .choice-label { font-weight: 900; color: var(--accent); min-width: 18px; }
+    .choice-btn.correct { border-color: #27ae60; background: #eafaf1; color: #1a6b3a; }
+    .choice-btn.correct .choice-label { color: #27ae60; }
+    .choice-btn.wrong { border-color: var(--accent); background: #fdecea; color: #8b1a0a; }
+    .choice-btn:disabled { cursor: default; }
+    .answer-feedback {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 4px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .answer-feedback.show { display: block; }
+    .answer-feedback.correct-fb { background: #eafaf1; border: 1.5px solid #27ae60; color: #1a6b3a; }
+    .answer-feedback.wrong-fb { background: #fdecea; border: 1.5px solid var(--accent); color: #8b1a0a; }
+    .next-btn {
+      display: none;
+      width: 100%;
+      margin-top: 20px;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 16px;
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .next-btn:hover { background: var(--accent); }
+    .next-btn.show { display: block; }
+
+    /* RESULT */
+    #result-page { display: none; }
+    .result-container { max-width: 540px; margin: 0 auto; padding: 20px 20px 80px; text-align: center; }
+    .result-card {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 48px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+    }
+    .result-rank { font-family: 'Zen Antique Soft', serif; font-size: 5rem; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+    .result-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.2em; margin-bottom: 24px; }
+    .result-score { font-size: 2.5rem; font-weight: 900; color: var(--ink); margin-bottom: 4px; }
+    .result-score span { font-size: 1rem; color: var(--muted); font-weight: 400; }
+    .result-message { margin-top: 16px; font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+    .result-actions { display: flex; gap: 12px; margin-top: 32px; justify-content: center; flex-wrap: wrap; }
+    .result-btn {
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid var(--ink);
+    }
+    .result-btn.primary { background: var(--ink); color: var(--paper); }
+    .result-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+    .result-btn.secondary { background: transparent; color: var(--ink); }
+    .result-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    @media (max-width: 500px) {
+      .choices { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">アニメクイズ道場</div>
+  <div class="site-subtitle">ANIME QUIZ DOJO</div>
+</header>
+
+<div id="top-page">
+  <div class="section-label">クイズを選ぶ</div>
+  <div class="quiz-grid" id="quiz-grid"></div>
+</div>
+
+<div id="quiz-page">
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goTop()">← もどる</button>
+      <div class="quiz-title-bar" id="quiz-title-bar"></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-text">
+        <span id="progress-text">問題 1 / 10</span>
+        <span id="score-text">0点</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="question-card">
+      <div class="question-number" id="question-number">Q.1</div>
+      <div class="question-text" id="question-text"></div>
+    </div>
+    <div class="choices" id="choices"></div>
+    <div class="answer-feedback" id="answer-feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ →</button>
+  </div>
+</div>
+
+<div id="result-page">
+  <div class="result-container">
+    <div class="result-card">
+      <div class="result-rank" id="result-rank">S</div>
+      <div class="result-label">RANK</div>
+      <div class="result-score" id="result-score">10 <span>/ 10問正解</span></div>
+      <div class="result-message" id="result-message"></div>
+      <div class="result-actions">
+        <button class="result-btn primary" onclick="retryQuiz()">もう一度挑戦</button>
+        <button class="result-btn secondary" onclick="goTop()">クイズ一覧へ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  {
+    id: "kimetsu", title: "鬼滅の刃", emoji: "🗡️", difficulty: "normal",
+    questions: [
+      { q: "竈門炭治郎の妹の名前は？", choices: ["禰豆子","カナヲ","アオイ","まこも"], answer: 0, explanation: "竈門禰豆子は炭治郎の妹で、鬼になっても人を食べることを拒否し続けます。" },
+      { q: "炭治郎が最終的に使いこなす呼吸法は？", choices: ["水の呼吸","炎の呼吸","日の呼吸（ヒノカミ神楽）","雷の呼吸"], answer: 2, explanation: "炭治郎は「日の呼吸（ヒノカミ神楽）」を使いこなします。" },
+      { q: "鬼殺隊の最高位の剣士の称号は？", choices: ["剣聖","柱","鬼神","天覧"], answer: 1, explanation: "「柱」は鬼殺隊の最高位で、9名が存在します。" },
+      { q: "煉獄杏寿郎が使う呼吸法は？", choices: ["水の呼吸","音の呼吸","炎の呼吸","恋の呼吸"], answer: 2, explanation: "炎柱・煉獄杏寿郎は「炎の呼吸」の使い手です。" },
+      { q: "鬼の弱点として正しいのは？", choices: ["銀の武器","藤の花と日光","聖水","塩"], answer: 1, explanation: "鬼は藤の花と日光が弱点で、特に日光は致命的です。" },
+      { q: "伊之助の得意な呼吸法は？", choices: ["岩の呼吸","獣の呼吸","風の呼吸","土の呼吸"], answer: 1, explanation: "嘴平伊之助は自ら編み出した「獣の呼吸」を使います。" },
+      { q: "善逸が使える型は何型だけ？", choices: ["壱ノ型","弐ノ型","参ノ型","全ての型"], answer: 0, explanation: "我妻善逸は「雷の呼吸・壱ノ型」しか使えませんが、その練度は超一流です。" },
+      { q: "「上弦の壱」の鬼の名前は？", choices: ["猗窩座","黒死牟","童磨","半天狗"], answer: 1, explanation: "上弦の壱は「黒死牟」。かつて縁壱の兄でした。" },
+      { q: "炭治郎に水の呼吸を最初に教えた師匠は？", choices: ["煉獄槇寿郎","鱗滝左近次","冨岡義勇","悲鳴嶼行冥"], answer: 1, explanation: "鱗滝左近次が炭治郎の最初の師匠で、水の呼吸を教えました。" },
+      { q: "無惨が生涯最も恐れていた人物は？", choices: ["柱全員","継国縁壱","悲鳴嶼行冥","産屋敷耀哉"], answer: 1, explanation: "鬼舞辻無惨は日の呼吸の使い手・継国縁壱を生涯恐れ続けていました。" }
+    ]
+  },
+  {
+    id: "onepiece", title: "ワンピース", emoji: "☠️", difficulty: "normal",
+    questions: [
+      { q: "ルフィが食べた悪魔の実は？", choices: ["ゴムゴムの実","メラメラの実","グラグラの実","ニキュニキュの実"], answer: 0, explanation: "ゴムゴムの実を食べたことでルフィの体はゴム人間になりました。" },
+      { q: "「海賊王」の称号を持つ人物は？", choices: ["白ひげ","シャンクス","ゴールド・ロジャー","黒ひげ"], answer: 2, explanation: "ゴールド・D・ロジャーが唯一「海賊王」の称号を持ちます。" },
+      { q: "ゾロが目指している称号は？", choices: ["海賊王","世界最強の剣士","七武海","四皇"], answer: 1, explanation: "ロロノア・ゾロの夢は「世界最強の剣士」になることです。" },
+      { q: "ナミの夢は？", choices: ["偉大な航路の制覇","世界地図を描くこと","億越えの懸賞金","伝説の宝を見つけること"], answer: 1, explanation: "ナミの夢は「世界地図を描くこと」です。" },
+      { q: "サンジの夢の海「オールブルー」とは？", choices: ["世界中の魚が集まる海","海の底にある楽園","幻の大陸","四つの海の交差点"], answer: 0, explanation: "オールブルーは東西南北の全ての海の魚が集まるという伝説の海です。" },
+      { q: "白ひげの能力は？", choices: ["グラグラの実","メラメラの実","マグマグの実","ピカピカの実"], answer: 0, explanation: "白ひげはグラグラの実の能力者で「世界最強の男」と呼ばれました。" },
+      { q: "赤犬（サカズキ）の能力は？", choices: ["グラグラの実","メラメラの実","マグマグの実","ヒエヒエの実"], answer: 2, explanation: "海軍大将・赤犬はマグマグの実の能力者です。" },
+      { q: "ウソップの夢は？", choices: ["世界最強の剣士","偉大な航路を制覇","勇敢な海の戦士になる","世界地図を描く"], answer: 2, explanation: "ウソップの夢は「勇敢な海の戦士」になることです。" },
+      { q: "シャンクスが属するグループは？", choices: ["七武海","四皇","革命軍","海軍"], answer: 1, explanation: "シャンクスは四皇の一人で、ルフィに麦わら帽子を譲った人物です。" },
+      { q: "麦わらの一味の現在の船の名前は？", choices: ["ゴーイングメリー号","サウザンドサニー号","モビーディック号","レッドフォース号"], answer: 1, explanation: "ウォーターセブン編以降は「サウザンドサニー号」に乗り換えました。" }
+    ]
+  },
+  {
+    id: "naruto", title: "NARUTO", emoji: "🍃", difficulty: "normal",
+    questions: [
+      { q: "ナルトの体に封印されている尾獣は？", choices: ["八尾","九尾","七尾","一尾"], answer: 1, explanation: "うずまきナルトには「九尾の妖狐（クラマ）」が封印されています。" },
+      { q: "うちはサスケの兄の名前は？", choices: ["マダラ","オビト","イタチ","シスイ"], answer: 2, explanation: "うちはイタチはサスケの兄で、木の葉を守るために一族を手にかけました。" },
+      { q: "サクラの師匠は誰？", choices: ["自来也","綱手","大蛇丸","カカシ"], answer: 1, explanation: "春野サクラは五代目火影・綱手に医療忍術を師事しました。" },
+      { q: "「写輪眼」はどの一族の血継限界？", choices: ["日向一族","うちは一族","うずまき一族","千手一族"], answer: 1, explanation: "写輪眼はうちは一族特有の血継限界（瞳術）です。" },
+      { q: "木の葉の初代火影は？", choices: ["自来也","千手柱間","波風ミナト","猿飛ヒルゼン"], answer: 1, explanation: "千手柱間が「初代火影」で、木の葉隠れの里を作った人物です。" },
+      { q: "ナルトの父親は？", choices: ["自来也","猿飛ヒルゼン","波風ミナト","うみのイルカ"], answer: 2, explanation: "四代目火影・波風ミナトがナルトの父親です。" },
+      { q: "「暁」で「芸術は爆発だ」が口癖のキャラは？", choices: ["ペイン","デイダラ","サソリ","トビ"], answer: 1, explanation: "デイダラは「芸術は爆発だ」という哲学を持つ暁のメンバーです。" },
+      { q: "カカシが写輪眼を持つ理由は？", choices: ["うちは一族の血筋","友人オビトから移植","大蛇丸から奪った","訓練で覚醒した"], answer: 1, explanation: "カカシはうちはオビトから片目の写輪眼を譲り受けました。" },
+      { q: "ナルトが最初に習得した忍術は？", choices: ["影分身の術","螺旋丸","千鳥","豪火球の術"], answer: 0, explanation: "ナルトが最初に習得したのは「影分身の術」で、卒業試験でも使いました。" },
+      { q: "マイト・ガイが使う秘奥義は？", choices: ["八門遁甲","仙人モード","尾獣モード","写輪眼"], answer: 0, explanation: "マイト・ガイは「八門遁甲」の使い手で、第八門を開放しました。" }
+    ]
+  },
+  {
+    id: "dragonball", title: "ドラゴンボール", emoji: "🐉", difficulty: "easy",
+    questions: [
+      { q: "悟空の戦闘民族は？", choices: ["ナメック星人","フリーザ一族","サイヤ人","魔人"], answer: 2, explanation: "孫悟空はサイヤ人（カカロット）で、地球に送られました。" },
+      { q: "「かめはめ波」を最初に悟空が真似した相手は？", choices: ["亀仙人","ピッコロ","クリリン","神様"], answer: 0, explanation: "亀仙人（武天老師）が使うかめはめ波を悟空が見よう見まねで習得しました。" },
+      { q: "スーパーサイヤ人に初めて変身したのは誰？", choices: ["ベジータ","悟空","トランクス","悟飯"], answer: 1, explanation: "悟空がナメック星でフリーザに激怒しスーパーサイヤ人に初変身しました。" },
+      { q: "「ドラゴンボールZ」最初の強敵は？", choices: ["フリーザ","セル","ラディッツ","ベジータ"], answer: 2, explanation: "Zの最初の敵は悟空の兄・ラディッツで、悟空の出生の秘密を明かします。" },
+      { q: "魔人ブウを最終的に倒した技は？", choices: ["かめはめ波","元気玉","最終閃光拳","スピリットソード"], answer: 1, explanation: "地球人のエネルギーを集めた元気玉で魔人ブウを消滅させました。" },
+      { q: "ピッコロの出身は？", choices: ["サイヤ人の星","ナメック星","地球","フリーザ軍"], answer: 1, explanation: "ピッコロはナメック星人で、神様から分裂した存在です。" },
+      { q: "フュージョンの舞で悟空とベジータが合体すると？", choices: ["ベジット","ゴジータ","スーパーベジータ","カカベジ"], answer: 1, explanation: "フュージョンの舞ではゴジータ、ポタラではベジットになります。" },
+      { q: "界王拳を使うと何が起きる？", choices: ["気が倍増するが体に負担がかかる","超サイヤ人に変身できる","敵の攻撃を反射できる","時間を止められる"], answer: 0, explanation: "界王拳は戦闘力を倍増させますが、体への負担が大きい技です。" },
+      { q: "悟空の息子（Z）は？", choices: ["悟天・悟空Jr.","悟飯・悟空Jr.","悟飯・悟天","トランクス・悟天"], answer: 2, explanation: "長男・孫悟飯、次男・孫悟天が悟空の息子です。" },
+      { q: "地球のドラゴンボールで呼び出す龍の名前は？", choices: ["シェンロン","ポルンガ","ウルトラシェン","龍神"], answer: 0, explanation: "地球のドラゴンボールで呼び出される龍は「神龍（シェンロン）」です。" }
+    ]
+  },
+  {
+    id: "evangelion", title: "エヴァンゲリオン", emoji: "🤖", difficulty: "hard",
+    questions: [
+      { q: "主人公の名前は？", choices: ["碇シンジ","渚カヲル","加持リョウジ","鈴原トウジ"], answer: 0, explanation: "主人公は碇シンジ。ゲンドウの息子でエヴァ初号機のパイロットです。" },
+      { q: "エヴァが戦う敵の名称は？", choices: ["エイリアン","使徒","天使","鬼神"], answer: 1, explanation: "エヴァが戦う謎の生命体は「使徒（しと）」と呼ばれます。" },
+      { q: "綾波レイが搭乗するエヴァは何号機？", choices: ["零号機","初号機","弐号機","参号機"], answer: 0, explanation: "綾波レイはエヴァンゲリオン零号機のパイロットです。" },
+      { q: "惣流・アスカ・ラングレーの出身は？", choices: ["日本","アメリカ","ドイツ系アメリカ人","フランス"], answer: 2, explanation: "アスカはドイツ系アメリカ人で、弐号機のパイロットです。" },
+      { q: "ネルフの本部がある都市は？", choices: ["東京","第三新東京市","大阪","京都"], answer: 1, explanation: "ネルフ本部は「第三新東京市」の地下に建設されています。" },
+      { q: "「人類補完計画」を推進していた組織は？", choices: ["ゼーレ","ネルフ","ヴィレ","使徒"], answer: 0, explanation: "ゼーレ（SEELE）は人類補完計画を推進する秘密組織です。" },
+      { q: "エヴァの内部電源が切れるまでの時間は？", choices: ["30秒","1分","約5分","無制限"], answer: 2, explanation: "内部電源では約5分しか稼働できないのがエヴァの大きな制約です。" },
+      { q: "碇ゲンドウの妻（シンジの母）の名前は？", choices: ["碇ユイ","赤木リツコ","葛城ミサト","綾波レイ"], answer: 0, explanation: "碇ユイはゲンドウの妻でシンジの母。初号機に取り込まれています。" },
+      { q: "使徒の数は全部で何体？", choices: ["13体","17体","24体","10体"], answer: 1, explanation: "使徒は第1使徒から第18使徒まで合計17体登場します。" },
+      { q: "エヴァのコアに存在しているとされるものは？", choices: ["AI","人間の魂","エネルギー炉","反物質"], answer: 1, explanation: "エヴァのコアには人間の魂が宿っており、パイロットとの同調を可能にします。" }
+    ]
+  },
+  {
+    id: "pokemon", title: "ポケットモンスター", emoji: "⚡", difficulty: "easy",
+    questions: [
+      { q: "ピカチュウのタイプは？", choices: ["ほのお","でんき","みず","くさ"], answer: 1, explanation: "ピカチュウはでんきタイプのポケモンです。" },
+      { q: "カントー地方の御三家でないのは？", choices: ["フシギダネ","ヒトカゲ","ミズゴロウ","ゼニガメ"], answer: 2, explanation: "ミズゴロウはホウエン地方（ルビー・サファイア）の御三家です。" },
+      { q: "ポケモンのタイプは全部で何種類（第6世代以降）？", choices: ["17種類","18種類","16種類","20種類"], answer: 1, explanation: "フェアリータイプが追加された第6世代以降、タイプは全18種類です。" },
+      { q: "スーパーサイヤ人に初めて変身したのはどっち？（関係ない問題）\n…もとい、イーブイが「サンダース」に進化する条件は？", choices: ["かみなりのいし","みずのいし","ほのおのいし","レベルアップ"], answer: 0, explanation: "イーブイはかみなりのいしを使うとサンダースに進化します。" },
+      { q: "伝説のポケモン「ミュウツー」を作ったのは？", choices: ["シルフカンパニー","ロケット団","ポケモン協会","博士チーム"], answer: 1, explanation: "ロケット団がミュウのDNAを改造してミュウツーを生み出しました。" },
+      { q: "「ぜったいれいど」が必ず外れる相手は？", choices: ["こおりタイプ","ひこうタイプ","自分よりレベルが高い相手","はがねタイプ"], answer: 2, explanation: "ぜったいれいどは自分より高いレベルのポケモンには当たりません。" },
+      { q: "第1世代のポケモンの総数は（ミュウ含む）？", choices: ["150匹","151匹","152匹","149匹"], answer: 1, explanation: "第1世代（赤・緑）ではミュウを含む151匹が登場します。" },
+      { q: "ゲンガーの進化系統の順番は？", choices: ["ゴースト→ゴース→ゲンガー","ゴース→ゴースト→ゲンガー","ゲンガー→ゴースト→ゴース","ゴース→ゲンガー→ゴースト"], answer: 1, explanation: "ゴース→ゴースト→ゲンガーの順に進化します。" },
+      { q: "トレーナー戦で使えないコマンドは？", choices: ["たたかう","どうぐ","ポケモン","にげる"], answer: 3, explanation: "トレーナー戦では「にげる」コマンドは使えません。" },
+      { q: "「みず」タイプに弱いタイプは？", choices: ["ほのお","くさ","でんき","いわ"], answer: 0, explanation: "ほのおタイプはみずタイプの技に弱い（2倍ダメージ）です。" }
+    ]
+  }
+];
+
+let currentQuiz = null;
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+const labels = ['A', 'B', 'C', 'D'];
+
+function showPage(page) {
+  document.getElementById('top-page').style.display = page === 'top' ? 'block' : 'none';
+  document.getElementById('quiz-page').style.display = page === 'quiz' ? 'block' : 'none';
+  document.getElementById('result-page').style.display = page === 'result' ? 'block' : 'none';
+}
+
+function renderTop() {
+  const grid = document.getElementById('quiz-grid');
+  grid.innerHTML = quizData.map(q => `
+    <div class="quiz-card" onclick="startQuiz('${q.id}')">
+      <div class="card-emoji">${q.emoji}</div>
+      <div class="card-title">${q.title}</div>
+      <div class="card-meta">${q.questions.length}問</div>
+      <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
+    </div>
+  `).join('');
+}
+
+function startQuiz(id) {
+  currentQuiz = quizData.find(q => q.id === id);
+  currentIndex = 0;
+  score = 0;
+  showPage('quiz');
+  document.getElementById('quiz-title-bar').textContent = currentQuiz.emoji + ' ' + currentQuiz.title;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = currentQuiz.questions[currentIndex];
+  const total = currentQuiz.questions.length;
+
+  document.getElementById('question-number').textContent = `Q.${currentIndex + 1}`;
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('progress-text').textContent = `問題 ${currentIndex + 1} / ${total}`;
+  document.getElementById('score-text').textContent = `${score}点`;
+  document.getElementById('progress-fill').style.width = `${(currentIndex / total) * 100}%`;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = q.choices.map((c, i) => `
+    <button class="choice-btn" onclick="selectAnswer(${i})">
+      <span class="choice-label">${labels[i]}</span>
+      <span>${c}</span>
+    </button>
+  `).join('');
+
+  const fb = document.getElementById('answer-feedback');
+  fb.className = 'answer-feedback';
+  fb.textContent = '';
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.className = 'next-btn';
+  nextBtn.textContent = currentIndex + 1 === total ? '結果を見る 🎉' : '次の問題へ →';
+}
+
+function selectAnswer(index) {
+  if (answered) return;
+  answered = true;
+
+  const q = currentQuiz.questions[currentIndex];
+  const buttons = document.querySelectorAll('.choice-btn');
+  buttons.forEach(btn => btn.disabled = true);
+
+  if (index === q.answer) {
+    score++;
+    buttons[index].classList.add('correct');
+    const fb = document.getElementById('answer-feedback');
+    fb.className = 'answer-feedback correct-fb show';
+    fb.innerHTML = `✅ 正解！　${q.explanation}`;
+  } else {
+    buttons[index].classList.add('wrong');
+    buttons[q.answer].classList.add('correct');
+    const fb = document.getElementById('answer-feedback');
+    fb.className = 'answer-feedback wrong-fb show';
+    fb.innerHTML = `❌ 不正解…　正解は「${q.choices[q.answer]}」です。<br>${q.explanation}`;
+  }
+
+  document.getElementById('score-text').textContent = `${score}点`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuiz.questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  showPage('result');
+  const total = currentQuiz.questions.length;
+  const pct = score / total;
+
+  let rank, msg;
+  if (pct === 1)       { rank = 'S'; msg = '完璧です！真のアニメ通ですね👑'; }
+  else if (pct >= 0.8) { rank = 'A'; msg = 'すごい！かなりの知識量です🔥'; }
+  else if (pct >= 0.6) { rank = 'B'; msg = 'なかなかの実力！もう少しで上位ランク✨'; }
+  else if (pct >= 0.4) { rank = 'C'; msg = '半分以上はクリア！復習してリベンジを💪'; }
+  else                 { rank = 'D'; msg = '作品を見返してリトライしよう！📺'; }
+
+  document.getElementById('result-rank').textContent = rank;
+  document.getElementById('result-score').innerHTML = `${score} <span>/ ${total}問正解</span>`;
+  document.getElementById('result-message').textContent = msg;
+  document.getElementById('progress-fill').style.width = '100%';
+}
+
+function retryQuiz() { startQuiz(currentQuiz.id); }
+function goTop() { showPage('top'); }
+
+renderTop();
+showPage('top');
+</script>
+</body>
+</html>

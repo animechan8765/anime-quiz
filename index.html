@@ -362,6 +362,48 @@
       white-space: nowrap;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* RATING & SHARE */
+    .rating-wrap, .share-wrap {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .rating-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+    .rating-btns { display: flex; gap: 12px; justify-content: center; }
+    .rating-btn {
+      padding: 10px 24px;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .rating-btn:hover { transform: scale(1.05); }
+    .rating-btn.good:hover, .rating-btn.good.voted { border-color: #27ae60; background: #eafaf1; }
+    .rating-btn.bad:hover, .rating-btn.bad.voted { border-color: var(--accent); background: #fdecea; }
+    .rating-btn:disabled { cursor: default; transform: none; }
+    .share-btn {
+      width: 100%;
+      padding: 12px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.05em;
+    }
+    .share-btn:hover { background: #333; }
   </style>
 </head>
 <body>
@@ -412,6 +454,20 @@
       <div class="result-label">RANK</div>
       <div class="result-score" id="result-score">10 <span>/ 10問正解</span></div>
       <div class="result-message" id="result-message"></div>
+
+      <div class="rating-wrap">
+        <div class="rating-label">このクイズどうでしたか？</div>
+        <div class="rating-btns">
+          <button class="rating-btn good" id="good-btn" onclick="rateQuiz('good')">👍 <span id="good-count">0</span></button>
+          <button class="rating-btn bad" id="bad-btn" onclick="rateQuiz('bad')">👎 <span id="bad-count">0</span></button>
+        </div>
+      </div>
+
+      <div class="share-wrap">
+        <div class="rating-label">結果をシェアする</div>
+        <button class="share-btn" onclick="shareResult()">𝕏 でシェア</button>
+      </div>
+
       <div class="result-actions">
         <button class="result-btn primary" onclick="retryQuiz()">もう一度挑戦</button>
         <button class="result-btn secondary" onclick="goTop()">クイズ一覧へ</button>
@@ -893,10 +949,73 @@ function showResult() {
   document.getElementById('result-score').innerHTML = `${score} <span>/ ${total}問正解</span>`;
   document.getElementById('result-message').textContent = msg;
   document.getElementById('progress-fill').style.width = '100%';
+
+  // グッド/バッドリセット
+  hasRated = false;
+  document.getElementById('good-btn').disabled = false;
+  document.getElementById('bad-btn').disabled = false;
+  document.getElementById('good-btn').classList.remove('voted');
+  document.getElementById('bad-btn').classList.remove('voted');
+  document.getElementById('good-count').textContent = currentQuiz.likes || 0;
+  document.getElementById('bad-count').textContent = currentQuiz.dislikes || 0;
 }
 
 function retryQuiz() { startQuiz(currentQuiz.id); }
 function goTop() { showPage('top'); }
+
+// ===== グッド/バッド評価 =====
+let hasRated = false;
+
+async function rateQuiz(type) {
+  if (hasRated) { showToast('すでに評価済みです'); return; }
+  if (!currentQuiz.isUserQuiz) {
+    // 組み込みクイズはローカルでカウント
+    showToast(type === 'good' ? '👍 ありがとうございます！' : '👎 フィードバックありがとうございます！');
+    hasRated = true;
+    document.getElementById('good-btn').classList.toggle('voted', type === 'good');
+    document.getElementById('bad-btn').classList.toggle('voted', type === 'bad');
+    document.getElementById('good-btn').disabled = true;
+    document.getElementById('bad-btn').disabled = true;
+    return;
+  }
+
+  const id = currentQuiz.id.replace('user_', '');
+  const field = type === 'good' ? 'likes' : 'dislikes';
+  const current = type === 'good' ? currentQuiz.likes || 0 : currentQuiz.dislikes || 0;
+
+  try {
+    await sbFetch(`/rest/v1/quizzes?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ [field]: current + 1 })
+    });
+    hasRated = true;
+    if (type === 'good') {
+      document.getElementById('good-count').textContent = current + 1;
+      document.getElementById('good-btn').classList.add('voted');
+    } else {
+      document.getElementById('bad-count').textContent = current + 1;
+      document.getElementById('bad-btn').classList.add('voted');
+    }
+    document.getElementById('good-btn').disabled = true;
+    document.getElementById('bad-btn').disabled = true;
+    showToast(type === 'good' ? '👍 ありがとうございます！' : '👎 フィードバックありがとうございます！');
+  } catch(e) {
+    showToast('評価に失敗しました');
+  }
+}
+
+// ===== 結果シェア =====
+function shareResult() {
+  const total = currentQuiz.questions.length;
+  const rank = document.getElementById('result-rank').textContent;
+  const text = `「${currentQuiz.emoji} ${currentQuiz.title}」クイズに挑戦！
+${score}/${total}問正解でランク${rank}でした🎉
+
+あなたも挑戦してみて👇
+https://animechan8765.github.io/anime-quiz/`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
 
 function filterQuiz() {
   const word = document.getElementById('search-input').value.trim().toLowerCase();

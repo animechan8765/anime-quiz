@@ -272,6 +272,96 @@
       font-size: 0.95rem;
       display: none;
     }
+
+    /* CREATE PAGE */
+    #create-page { display: none; }
+    .create-container { max-width: 680px; margin: 0 auto; padding: 20px 20px 60px; }
+    .create-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .form-section { background: var(--card); border: 2px solid var(--border); border-radius: 4px; padding: 28px; margin-bottom: 20px; }
+    .form-section-title { font-family: 'Zen Antique Soft', serif; font-size: 1rem; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.1em; }
+    .form-row { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.1em; }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border);
+      border-radius: 3px;
+      background: var(--paper);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .question-block { border: 1.5px solid var(--border); border-radius: 3px; padding: 18px; margin-bottom: 12px; background: var(--paper); }
+    .question-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .question-block-num { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; }
+    .remove-q-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.8rem; padding: 2px 6px; }
+    .remove-q-btn:hover { color: var(--accent); }
+    .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .choice-input-wrap { display: flex; align-items: center; gap: 6px; }
+    .choice-radio { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+    .add-q-btn {
+      width: 100%;
+      padding: 12px;
+      border: 2px dashed var(--border);
+      border-radius: 3px;
+      background: none;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 4px;
+    }
+    .add-q-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { background: #a93226; }
+    .submit-btn:disabled { background: var(--muted); cursor: not-allowed; }
+    .create-nav-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 10px 20px;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      background: none;
+      color: var(--accent);
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.1em;
+    }
+    .create-nav-btn:hover { background: var(--accent); color: white; }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -279,6 +369,7 @@
 <header>
   <div class="site-title">アニメクイズ道場</div>
   <div class="site-subtitle">ANIME QUIZ DOJO</div>
+  <button class="create-nav-btn" onclick="showPage('create')" style="margin-top:16px;">＋ クイズを投稿する</button>
 </header>
 
 <div id="top-page">
@@ -329,7 +420,195 @@
   </div>
 </div>
 
+<!-- 投稿ページ -->
+<div id="create-page">
+  <div class="create-container">
+    <div class="create-header">
+      <button class="back-btn" onclick="showPage('top')">← もどる</button>
+      <div class="quiz-title-bar">クイズを投稿する</div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">基本情報</div>
+      <div class="form-row">
+        <label class="form-label">アニメタイトル *</label>
+        <input class="form-input" id="c-title" type="text" placeholder="例：進撃の巨人" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">絵文字（任意）</label>
+        <input class="form-input" id="c-emoji" type="text" placeholder="例：⚔️" maxlength="2" style="max-width:80px;" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">難易度</label>
+        <select class="form-select" id="c-difficulty" style="max-width:160px;">
+          <option value="easy">初級</option>
+          <option value="normal" selected>中級</option>
+          <option value="hard">上級</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">問題（最低3問・最大10問）</div>
+      <div id="questions-list"></div>
+      <button class="add-q-btn" onclick="addQuestion()">＋ 問題を追加する</button>
+    </div>
+
+    <button class="submit-btn" onclick="submitQuiz()">投稿する 🎉</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
+// Supabase設定
+const SUPABASE_URL = 'https://bydazkjcltnemwyyazjd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_B-llQL7Y7d7YmSFtGZxUig_VWQjLaL1';
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...(options.headers || {})
+    }
+  });
+  return res.json();
+}
+
+// ===== 投稿フォーム =====
+let questionCount = 0;
+
+function addQuestion() {
+  const list = document.getElementById('questions-list');
+  const total = list.querySelectorAll('.question-block').length;
+  if (total >= 10) { showToast('問題は最大10問までです'); return; }
+  
+  questionCount++;
+  const qid = questionCount;
+  const div = document.createElement('div');
+  div.className = 'question-block';
+  div.dataset.qid = qid;
+  div.innerHTML = `
+    <div class="question-block-header">
+      <span class="question-block-num">Q.${total + 1}</span>
+      <button class="remove-q-btn" onclick="removeQuestion(${qid})">✕ 削除</button>
+    </div>
+    <div class="form-row">
+      <label class="form-label">問題文 *</label>
+      <input class="form-input q-text" type="text" placeholder="例：主人公の名前は？" />
+    </div>
+    <div class="form-row">
+      <label class="form-label">選択肢（正解をラジオボタンで選ぶ）*</label>
+      <div class="choices-grid">
+        ${[0,1,2,3].map(i => `
+          <div class="choice-input-wrap">
+            <input type="radio" class="choice-radio q-radio" name="correct-${qid}" value="${i}" />
+            <input class="form-input q-choice" type="text" placeholder="選択肢${i+1}" style="margin-bottom:0;" />
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">解説（任意）</label>
+      <input class="form-input q-explanation" type="text" placeholder="正解の説明を入力" />
+    </div>
+  `;
+  list.appendChild(div);
+}
+
+function removeQuestion(qid) {
+  const block = document.querySelector(`.question-block[data-qid="${qid}"]`);
+  if (block) block.remove();
+  // 番号を振り直す
+  document.querySelectorAll('.question-block').forEach((b, i) => {
+    b.querySelector('.question-block-num').textContent = `Q.${i + 1}`;
+  });
+}
+
+async function submitQuiz() {
+  const title = document.getElementById('c-title').value.trim();
+  const emoji = document.getElementById('c-emoji').value.trim() || '🎯';
+  const difficulty = document.getElementById('c-difficulty').value;
+
+  if (!title) { showToast('タイトルを入力してください'); return; }
+
+  const blocks = document.querySelectorAll('.question-block');
+  if (blocks.length < 3) { showToast('最低3問入力してください'); return; }
+
+  const questions = [];
+  let valid = true;
+
+  blocks.forEach((block, i) => {
+    const q = block.querySelector('.q-text').value.trim();
+    const choices = [...block.querySelectorAll('.q-choice')].map(el => el.value.trim());
+    const radioChecked = block.querySelector('.q-radio:checked');
+    const explanation = block.querySelector('.q-explanation').value.trim();
+
+    if (!q || choices.some(c => !c) || !radioChecked) {
+      showToast(`Q.${i+1}：問題文・選択肢・正解をすべて入力してください`);
+      valid = false;
+      return;
+    }
+    questions.push({ q, choices, answer: parseInt(radioChecked.value), explanation });
+  });
+
+  if (!valid) return;
+
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = '投稿中...';
+
+  const data = await sbFetch('/rest/v1/quizzes', {
+    method: 'POST',
+    body: JSON.stringify({ title, emoji, difficulty, questions })
+  });
+
+  btn.disabled = false;
+  btn.textContent = '投稿する 🎉';
+
+  if (data && data[0] && data[0].id) {
+    showToast('投稿完了！ありがとうございます🎉');
+    // フォームリセット
+    document.getElementById('c-title').value = '';
+    document.getElementById('c-emoji').value = '';
+    document.getElementById('questions-list').innerHTML = '';
+    questionCount = 0;
+    setTimeout(() => { showPage('top'); loadUserQuizzes(); }, 2000);
+  } else {
+    showToast('投稿に失敗しました。もう一度お試しください');
+    console.error(data);
+  }
+}
+
+// ===== 投稿されたクイズをSupabaseから読み込む =====
+let userQuizzes = [];
+
+async function loadUserQuizzes() {
+  const data = await sbFetch('/rest/v1/quizzes?select=*&order=created_at.desc');
+  if (Array.isArray(data)) {
+    userQuizzes = data.map(q => ({
+      id: 'user_' + q.id,
+      title: q.title,
+      emoji: q.emoji || '🎯',
+      difficulty: q.difficulty || 'normal',
+      questions: q.questions,
+      isUserQuiz: true
+    }));
+    renderTop();
+  }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
 const quizData = [
   {
     id: "kimetsu", title: "鬼滅の刃", emoji: "🗡️", difficulty: "normal",
@@ -493,14 +772,19 @@ function showPage(page) {
   document.getElementById('top-page').style.display = page === 'top' ? 'block' : 'none';
   document.getElementById('quiz-page').style.display = page === 'quiz' ? 'block' : 'none';
   document.getElementById('result-page').style.display = page === 'result' ? 'block' : 'none';
+  document.getElementById('create-page').style.display = page === 'create' ? 'block' : 'none';
+  if (page === 'create' && document.getElementById('questions-list').children.length === 0) {
+    addQuestion(); addQuestion(); addQuestion();
+  }
 }
 
 function renderTop() {
   const grid = document.getElementById('quiz-grid');
-  grid.innerHTML = quizData.map(q => `
+  const allQuizzes = [...quizData, ...userQuizzes];
+  grid.innerHTML = allQuizzes.map(q => `
     <div class="quiz-card" onclick="startQuiz('${q.id}')">
       <div class="card-emoji">${q.emoji}</div>
-      <div class="card-title">${q.title}</div>
+      <div class="card-title">${q.title}${q.isUserQuiz ? ' <span style=\"font-size:0.6rem;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:2px;vertical-align:middle;\">投稿</span>' : ''}</div>
       <div class="card-meta">${q.questions.length}問</div>
       <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
     </div>
@@ -606,7 +890,8 @@ function filterQuiz() {
   const noResults = document.getElementById('no-results');
   const noResultsWord = document.getElementById('no-results-word');
 
-  const filtered = quizData.filter(q => q.title.toLowerCase().includes(word));
+  const allQuizzes = [...quizData, ...userQuizzes];
+  const filtered = allQuizzes.filter(q => q.title.toLowerCase().includes(word));
 
   if (filtered.length === 0) {
     grid.innerHTML = '';
@@ -627,6 +912,7 @@ function filterQuiz() {
 
 renderTop();
 showPage('top');
+loadUserQuizzes();
 </script>
 </body>
 </html>

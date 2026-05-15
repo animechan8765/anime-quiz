@@ -805,7 +805,8 @@ function renderTop() {
 }
 
 function startQuiz(id) {
-  currentQuiz = quizData.find(q => q.id === id);
+  const allQuizzes = [...quizData, ...userQuizzes];
+  currentQuiz = allQuizzes.find(q => q.id === id);
   currentIndex = 0;
   score = 0;
   showPage('quiz');

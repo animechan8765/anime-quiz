@@ -476,6 +476,11 @@ async function sbFetch(path, options = {}) {
       ...(options.headers || {})
     }
   });
+  if (!res.ok) {
+    const err = await res.json();
+    console.error('Supabase error:', JSON.stringify(err));
+    throw err;
+  }
   return res.json();
 }
 
@@ -562,17 +567,25 @@ async function submitQuiz() {
   btn.disabled = true;
   btn.textContent = '投稿中...';
 
-  const data = await sbFetch('/rest/v1/quizzes', {
-    method: 'POST',
-    body: JSON.stringify({ title, emoji, difficulty, questions })
-  });
+  let data;
+  try {
+    data = await sbFetch('/rest/v1/quizzes', {
+      method: 'POST',
+      body: JSON.stringify({ title, emoji, difficulty, questions })
+    });
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '投稿する 🎉';
+    showToast('投稿に失敗しました: ' + (e.message || JSON.stringify(e)));
+    console.error('Submit error:', e);
+    return;
+  }
 
   btn.disabled = false;
   btn.textContent = '投稿する 🎉';
 
   if (data && data[0] && data[0].id) {
     showToast('投稿完了！ありがとうございます🎉');
-    // フォームリセット
     document.getElementById('c-title').value = '';
     document.getElementById('c-emoji').value = '';
     document.getElementById('questions-list').innerHTML = '';
@@ -580,7 +593,7 @@ async function submitQuiz() {
     setTimeout(() => { showPage('top'); loadUserQuizzes(); }, 2000);
   } else {
     showToast('投稿に失敗しました。もう一度お試しください');
-    console.error(data);
+    console.error('Response:', JSON.stringify(data));
   }
 }
 

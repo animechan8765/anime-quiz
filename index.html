@@ -144,6 +144,8 @@
     }
     .question-number { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 12px; font-weight: 700; }
     .question-text { font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 1.7; font-weight: 700; }
+    .question-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .question-stat { font-size: 0.72rem; color: var(--muted); background: var(--paper); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; }
     .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .choice-btn {
       background: var(--card);
@@ -473,7 +475,10 @@
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
     </div>
     <div class="question-card">
-      <div class="question-number" id="question-number">Q.1</div>
+      <div class="question-card-header">
+        <div class="question-number" id="question-number">Q.1</div>
+        <div class="question-stat" id="question-stat" style="display:none;"></div>
+      </div>
       <div class="question-text" id="question-text"></div>
     </div>
     <div class="choices" id="choices"></div>
@@ -965,6 +970,14 @@ function renderQuestion() {
   fb.className = 'answer-feedback';
   fb.textContent = '';
 
+  // 正解率を右上に表示（投稿クイズのみ）
+  const statEl = document.getElementById('question-stat');
+  statEl.style.display = 'none';
+  statEl.textContent = '';
+  if (currentQuiz.isUserQuiz) {
+    loadQuestionStat(currentQuiz.id, currentIndex);
+  }
+
   const nextBtn = document.getElementById('next-btn');
   nextBtn.className = 'next-btn';
   nextBtn.textContent = currentIndex + 1 === total ? '結果を見る 🎉' : '次の問題へ →';
@@ -984,14 +997,12 @@ function selectAnswer(index) {
     const fb = document.getElementById('answer-feedback');
     fb.className = 'answer-feedback correct-fb show';
     fb.innerHTML = `✅ 正解！　${q.explanation}`;
-    if (currentQuiz.isUserQuiz) loadAndShowStat(fb, currentQuiz.id, currentIndex, true);
   } else {
     buttons[index].classList.add('wrong');
     buttons[q.answer].classList.add('correct');
     const fb = document.getElementById('answer-feedback');
     fb.className = 'answer-feedback wrong-fb show';
     fb.innerHTML = `❌ 不正解…　正解は「${q.choices[q.answer]}」です。<br>${q.explanation}`;
-    if (currentQuiz.isUserQuiz) loadAndShowStat(fb, currentQuiz.id, currentIndex, false);
   }
 
   document.getElementById('score-text').textContent = `${score}点`;
@@ -1001,6 +1012,22 @@ function selectAnswer(index) {
   if (currentQuiz.isUserQuiz) {
     recordQuestionStat(currentQuiz.id, currentIndex, index === q.answer);
   }
+}
+
+async function loadQuestionStat(quizId, qIndex) {
+  const rid = quizId.replace('user_', '');
+  try {
+    const data = await sbFetch(`/rest/v1/question_stats?quiz_id=eq.${rid}&question_index=eq.${qIndex}&select=correct_count,total_count`);
+    if (data && data.length > 0) {
+      const row = data[0];
+      if (row.total_count > 0) {
+        const pct = Math.round((row.correct_count / row.total_count) * 100);
+        const statEl = document.getElementById('question-stat');
+        statEl.textContent = `正解率 ${pct}%`;
+        statEl.style.display = 'inline-block';
+      }
+    }
+  } catch(e) {}
 }
 
 async function loadAndShowStat(fbEl, quizId, qIndex, isCorrect) {

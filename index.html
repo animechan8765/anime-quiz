@@ -657,7 +657,7 @@ async function submitQuiz() {
 let userQuizzes = [];
 
 async function loadUserQuizzes() {
-  const data = await sbFetch('/rest/v1/quizzes?select=*&order=created_at.desc');
+  const data = await sbFetch('/rest/v1/quizzes?select=id,title,emoji,difficulty,questions,likes,dislikes&order=created_at.desc');
   if (Array.isArray(data)) {
     userQuizzes = data.map(q => ({
       id: 'user_' + q.id,

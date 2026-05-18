@@ -363,6 +363,36 @@
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* RANKING */
+    .ranking-wrap { margin-top: 32px; }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ranking-item:hover { border-color: var(--accent); transform: translateX(4px); }
+    .ranking-num {
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 1.4rem;
+      color: var(--muted);
+      min-width: 32px;
+      text-align: center;
+    }
+    .ranking-num.gold { color: #d4a017; }
+    .ranking-num.silver { color: #aaa; }
+    .ranking-num.bronze { color: #cd7f32; }
+    .ranking-info { flex: 1; }
+    .ranking-title { font-weight: 700; font-size: 0.95rem; }
+    .ranking-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .ranking-likes { font-size: 0.85rem; color: var(--accent); font-weight: 700; }
+
     /* RATING & SHARE */
     .rating-wrap, .share-wrap {
       margin-top: 24px;
@@ -415,6 +445,11 @@
 </header>
 
 <div id="top-page">
+  <div class="ranking-wrap" id="ranking-wrap" style="display:none;">
+    <div class="section-label">👑 人気ランキング TOP10</div>
+    <div id="ranking-list"></div>
+  </div>
+
   <div class="section-label">クイズを選ぶ</div>
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
@@ -667,10 +702,36 @@ async function loadUserQuizzes() {
       questions: q.questions,
       likes: q.likes || 0,
       dislikes: q.dislikes || 0,
+      play_count: q.play_count || 0,
       isUserQuiz: true
     }));
     renderTop();
+    renderRanking();
   }
+}
+
+function renderRanking() {
+  const ranked = [...userQuizzes]
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 10);
+
+  const wrap = document.getElementById('ranking-wrap');
+  const list = document.getElementById('ranking-list');
+
+  if (ranked.length === 0) { wrap.style.display = 'none'; return; }
+
+  wrap.style.display = 'block';
+  const medals = ['gold', 'silver', 'bronze'];
+  list.innerHTML = ranked.map((q, i) => `
+    <div class="ranking-item" onclick="startQuiz('${q.id}')">
+      <div class="ranking-num ${medals[i] || ''}">${i + 1}</div>
+      <div class="ranking-info">
+        <div class="ranking-title">${q.emoji} ${q.title}</div>
+        <div class="ranking-meta">${q.questions.length}問 · ${q.play_count}回プレイ</div>
+      </div>
+      <div class="ranking-likes">👍 ${q.likes}</div>
+    </div>
+  `).join('');
 }
 
 function showToast(msg) {
@@ -856,13 +917,13 @@ function renderTop() {
     <div class="quiz-card" onclick="startQuiz('${q.id}')">
       <div class="card-emoji">${q.emoji}</div>
       <div class="card-title">${q.title}${q.isUserQuiz ? ' <span style=\"font-size:0.6rem;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:2px;vertical-align:middle;\">投稿</span>' : ''}</div>
-      <div class="card-meta">${q.questions.length}問</div>
+      <div class="card-meta">${q.questions.length}問${q.isUserQuiz && q.play_count ? ' · ' + q.play_count + '回プレイ' : ''}</div>
       <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
     </div>
   `).join('');
 }
 
-function startQuiz(id) {
+async function startQuiz(id) {
   const allQuizzes = [...quizData, ...userQuizzes];
   currentQuiz = allQuizzes.find(q => q.id === id);
   currentIndex = 0;
@@ -870,6 +931,15 @@ function startQuiz(id) {
   showPage('quiz');
   document.getElementById('quiz-title-bar').textContent = currentQuiz.emoji + ' ' + currentQuiz.title;
   renderQuestion();
+
+  // play_countを増やす（投稿クイズのみ）
+  if (currentQuiz.isUserQuiz) {
+    const rid = currentQuiz.id.replace('user_', '');
+    sbFetch(`/rest/v1/quizzes?id=eq.${rid}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ play_count: (currentQuiz.play_count || 0) + 1 })
+    }).catch(() => {});
+  }
 }
 
 function renderQuestion() {
@@ -914,16 +984,65 @@ function selectAnswer(index) {
     const fb = document.getElementById('answer-feedback');
     fb.className = 'answer-feedback correct-fb show';
     fb.innerHTML = `✅ 正解！　${q.explanation}`;
+    if (currentQuiz.isUserQuiz) loadAndShowStat(fb, currentQuiz.id, currentIndex, true);
   } else {
     buttons[index].classList.add('wrong');
     buttons[q.answer].classList.add('correct');
     const fb = document.getElementById('answer-feedback');
     fb.className = 'answer-feedback wrong-fb show';
     fb.innerHTML = `❌ 不正解…　正解は「${q.choices[q.answer]}」です。<br>${q.explanation}`;
+    if (currentQuiz.isUserQuiz) loadAndShowStat(fb, currentQuiz.id, currentIndex, false);
   }
 
   document.getElementById('score-text').textContent = `${score}点`;
   document.getElementById('next-btn').classList.add('show');
+
+  // 正解率を記録（投稿クイズのみ）
+  if (currentQuiz.isUserQuiz) {
+    recordQuestionStat(currentQuiz.id, currentIndex, index === q.answer);
+  }
+}
+
+async function loadAndShowStat(fbEl, quizId, qIndex, isCorrect) {
+  const rid = quizId.replace('user_', '');
+  try {
+    const existing = await sbFetch(`/rest/v1/question_stats?quiz_id=eq.${rid}&question_index=eq.${qIndex}&select=correct_count,total_count`);
+    if (existing && existing.length > 0) {
+      const row = existing[0];
+      const total = row.total_count + 1;
+      const correct = row.correct_count + (isCorrect ? 1 : 0);
+      const pct = Math.round((correct / total) * 100);
+      fbEl.innerHTML += `<br><span style="font-size:0.78rem;opacity:0.7;">📊 みんなの正解率：${pct}%（${total}回回答）</span>`;
+    }
+  } catch(e) {}
+}
+
+async function recordQuestionStat(quizId, qIndex, isCorrect) {
+  const rid = quizId.replace('user_', '');
+  // 既存レコードを検索
+  try {
+    const existing = await sbFetch(`/rest/v1/question_stats?quiz_id=eq.${rid}&question_index=eq.${qIndex}&select=id,correct_count,total_count`);
+    if (existing && existing.length > 0) {
+      const row = existing[0];
+      await sbFetch(`/rest/v1/question_stats?id=eq.${row.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          correct_count: row.correct_count + (isCorrect ? 1 : 0),
+          total_count: row.total_count + 1
+        })
+      });
+    } else {
+      await sbFetch('/rest/v1/question_stats', {
+        method: 'POST',
+        body: JSON.stringify({
+          quiz_id: rid,
+          question_index: qIndex,
+          correct_count: isCorrect ? 1 : 0,
+          total_count: 1
+        })
+      });
+    }
+  } catch(e) { console.error('stat error:', e); }
 }
 
 function nextQuestion() {

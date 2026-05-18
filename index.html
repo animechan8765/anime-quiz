@@ -963,7 +963,7 @@ function showResult() {
 }
 
 function retryQuiz() { startQuiz(currentQuiz.id); }
-function goTop() { showPage('top'); }
+function goTop() { showPage('top'); loadUserQuizzes(); }
 
 // ===== グッド/バッド評価 =====
 let hasRated = false;

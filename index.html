@@ -665,6 +665,8 @@ async function loadUserQuizzes() {
       emoji: q.emoji || '🎯',
       difficulty: q.difficulty || 'normal',
       questions: q.questions,
+      likes: q.likes || 0,
+      dislikes: q.dislikes || 0,
       isUserQuiz: true
     }));
     renderTop();

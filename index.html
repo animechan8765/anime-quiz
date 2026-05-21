@@ -437,6 +437,7 @@
     }
     .share-btn:hover { background: #333; }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -568,22 +569,9 @@
 const SUPABASE_URL = 'https://bydazkjcltnemwyyazjd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5ZGF6a2pjbHRuZW13eXlhempkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODYyNDQsImV4cCI6MjA5NDM2MjI0NH0.fIXUJrkAvdnO1_DebLDK8X-GEB4uc7J8gOtSQon7s8k';
 
-// ===== 認証 =====
+// ===== 認証（Supabase SDK使用）=====
 let currentUser = null;
-
-async function getSession() {
-  const res = await fetch(SUPABASE_URL + '/auth/v1/user', {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + (getAccessToken() || SUPABASE_KEY)
-    }
-  });
-  if (res.ok) {
-    const data = await res.json();
-    if (data.id) return data;
-  }
-  return null;
-}
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function getAccessToken() {
   try {
@@ -597,26 +585,19 @@ function getAccessToken() {
 }
 
 async function signInWithGoogle() {
-  const redirectTo = encodeURIComponent(window.location.href);
-  const url = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${redirectTo}`;
-  window.location.href = url;
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.href
+    }
+  });
 }
 
 async function signOut() {
-  const token = getAccessToken();
-  if (token) {
-    await fetch(SUPABASE_URL + '/auth/v1/logout', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + token
-      }
-    });
-    // localStorageのsupabaseキーを削除
-    Object.keys(localStorage).filter(k => k.includes('supabase')).forEach(k => localStorage.removeItem(k));
-  }
+  await supabase.auth.signOut();
   currentUser = null;
   updateAuthUI();
+  renderTop();
 }
 
 function updateAuthUI() {
@@ -633,31 +614,28 @@ function updateAuthUI() {
 }
 
 async function initAuth() {
-  // URLにアクセストークンが含まれている場合（OAuth callback）
-  const hash = window.location.hash;
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.replace('#', ''));
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
-    if (accessToken) {
-      const storageKey = `sb-bydazkjcltnemwyyazjd-auth-token`;
-      localStorage.setItem(storageKey, JSON.stringify({
-        access_token: accessToken,
-        refresh_token: refreshToken
-      }));
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    currentUser = session.user;
   }
-  currentUser = await getSession();
   updateAuthUI();
+  renderTop();
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI();
+    renderTop();
+  });
 }
 
 async function sbFetch(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || SUPABASE_KEY;
   const res = await fetch(SUPABASE_URL + path, {
     ...options,
     headers: {
       'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
       ...(options.headers || {})
@@ -1287,7 +1265,8 @@ async function deleteQuiz(id) {
   if (!currentUser) { showToast('ログインが必要です'); return; }
   if (!confirm('このクイズを削除しますか？')) return;
   const rid = id.replace('user_', '');
-  const token = getAccessToken();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token || SUPABASE_KEY;
   try {
     await fetch(SUPABASE_URL + `/rest/v1/quizzes?id=eq.${rid}&user_id=eq.${currentUser.id}`, {
       method: 'DELETE',

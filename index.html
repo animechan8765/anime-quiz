@@ -777,6 +777,7 @@ async function loadUserQuizzes() {
       likes: q.likes || 0,
       dislikes: q.dislikes || 0,
       play_count: q.play_count || 0,
+      user_id: q.user_id || null,
       isUserQuiz: true
     }));
     renderTop();

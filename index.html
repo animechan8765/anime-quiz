@@ -445,7 +445,7 @@
   <div class="site-title">みんなのクイズパーク</div>
   <div class="site-subtitle">MINNA NO QUIZ PARK</div>
   <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
-    <button class="create-nav-btn" onclick="showPage('create')">＋ クイズを投稿する</button>
+    <button class="create-nav-btn" onclick="checkLoginAndCreate()">＋ クイズを投稿する</button>
     <button class="create-nav-btn" id="login-btn" onclick="signInWithGoogle()">🔑 Googleでログイン</button>
     <div id="user-info" style="display:none;align-items:center;gap:8px;">
       <span id="user-name" style="font-size:0.85rem;color:var(--muted);"></span>
@@ -582,6 +582,14 @@ function getAccessToken() {
     }
   } catch(e) {}
   return null;
+}
+
+function checkLoginAndCreate() {
+  if (!currentUser) {
+    showToast('クイズを投稿するにはGoogleログインが必要です🔑');
+    return;
+  }
+  showPage('create');
 }
 
 async function signInWithGoogle() {

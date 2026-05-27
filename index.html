@@ -349,6 +349,55 @@
       letter-spacing: 0.1em;
     }
     .create-nav-btn:hover { background: var(--accent); color: white; }
+    /* SHARE DIALOG */
+    .share-dialog-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none;
+    }
+    .share-dialog-overlay.show { display: flex; }
+    .share-dialog {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 36px 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+    }
+    .share-dialog-emoji { font-size: 3rem; margin-bottom: 12px; }
+    .share-dialog-title {
+      font-family: 'Zen Antique Soft', serif;
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+    .share-dialog-msg {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .share-dialog-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .share-dialog-btn {
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid var(--ink);
+    }
+    .share-dialog-btn.twitter { background: #000; color: white; border-color: #000; }
+    .share-dialog-btn.twitter:hover { background: #333; }
+    .share-dialog-btn.skip { background: transparent; color: var(--muted); border-color: var(--border); }
+    .share-dialog-btn.skip:hover { border-color: var(--ink); color: var(--ink); }
+
     .toast {
       position: fixed;
       bottom: 24px;
@@ -562,6 +611,18 @@
   </div>
 </div>
 
+<div class="share-dialog-overlay" id="share-dialog-overlay">
+  <div class="share-dialog">
+    <div class="share-dialog-emoji" id="share-dialog-emoji">🎉</div>
+    <div class="share-dialog-title" id="share-dialog-title">クイズを投稿しました！</div>
+    <div class="share-dialog-msg">みんなに挑戦してもらいましょう！<br>Xでシェアしてアクセスを増やそう🚀</div>
+    <div class="share-dialog-btns">
+      <button class="share-dialog-btn twitter" onclick="shareNewQuiz()">𝕏 でシェアする</button>
+      <button class="share-dialog-btn skip" onclick="closeShareDialog()">あとで</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -758,12 +819,17 @@ async function submitQuiz() {
   btn.textContent = '投稿する 🎉';
 
   if (data && data[0] && data[0].id) {
+    const quizTitle = title;
+    const quizEmoji = emoji;
     showToast('投稿完了！ありがとうございます🎉');
     document.getElementById('c-title').value = '';
     document.getElementById('c-emoji').value = '';
     document.getElementById('questions-list').innerHTML = '';
     questionCount = 0;
-    setTimeout(() => { showPage('top'); loadUserQuizzes(); }, 2000);
+    
+    // シェアダイアログを表示
+    showShareDialog(quizTitle, quizEmoji);
+    setTimeout(() => { loadUserQuizzes(); }, 1000);
   } else {
     showToast('投稿に失敗しました。もう一度お試しください');
     console.error('Response:', JSON.stringify(data));
@@ -791,6 +857,34 @@ async function loadUserQuizzes() {
     renderTop();
     renderRanking();
   }
+}
+
+// ===== 投稿シェアダイアログ =====
+let newQuizTitle = '';
+let newQuizEmoji = '';
+
+function showShareDialog(title, emoji) {
+  newQuizTitle = title;
+  newQuizEmoji = emoji;
+  document.getElementById('share-dialog-emoji').textContent = emoji + ' 🎉';
+  document.getElementById('share-dialog-title').textContent = `「${title}」を投稿しました！`;
+  document.getElementById('share-dialog-overlay').classList.add('show');
+}
+
+function closeShareDialog() {
+  document.getElementById('share-dialog-overlay').classList.remove('show');
+  showPage('top');
+}
+
+function shareNewQuiz() {
+  const text = `${newQuizEmoji}「${newQuizTitle}」のクイズを作りました！
+みんな挑戦してみてね🔥
+
+#みんなのクイズパーク
+https://animechan8765.github.io/anime-quiz/`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+  closeShareDialog();
 }
 
 function renderRanking() {

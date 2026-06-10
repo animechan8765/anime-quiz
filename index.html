@@ -3,64 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>アニメクイズ道場</title>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Antique+Soft&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet" />
+  <title>みんなのクイズパーク</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #1a1208;
-      --paper: #f5efe0;
-      --accent: #c0392b;
-      --accent2: #e67e22;
-      --gold: #d4a017;
-      --muted: #7a6a50;
-      --card: #fdf8ee;
-      --border: #c8b89a;
+      --ink: #f0f0f5;
+      --paper: #0d0d14;
+      --accent: #7c6fff;
+      --accent2: #ff6b9d;
+      --gold: #ffd700;
+      --muted: #6b6b8a;
+      --card: #16161f;
+      --border: #2a2a3a;
+      --surface: #1e1e2e;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
       background-color: var(--paper);
       color: var(--ink);
       min-height: 100vh;
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(180,160,120,0.15) 39px, rgba(180,160,120,0.15) 40px),
-        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(180,160,120,0.08) 39px, rgba(180,160,120,0.08) 40px);
     }
     header {
       text-align: center;
-      padding: 40px 20px 20px;
-    }
-    header::after {
-      content: '';
-      display: block;
-      width: 80px;
-      height: 4px;
-      background: var(--accent);
-      margin: 16px auto 0;
-      border-radius: 2px;
+      padding: 48px 20px 28px;
+      background: linear-gradient(180deg, #0d0d14 0%, #13131e 100%);
+      border-bottom: 1px solid var(--border);
     }
     .site-title {
-      font-family: 'Zen Antique Soft', serif;
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      color: var(--ink);
-      letter-spacing: 0.1em;
-      text-shadow: 3px 3px 0 rgba(192,57,43,0.15);
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #7c6fff 0%, #ff6b9d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .site-subtitle {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--muted);
       margin-top: 6px;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
     }
 
     /* TOP */
     #top-page { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
     .section-label {
-      font-family: 'Zen Antique Soft', serif;
-      font-size: 1.1rem;
-      color: var(--accent);
-      letter-spacing: 0.15em;
-      margin-bottom: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -73,9 +69,9 @@
     }
     .quiz-card {
       background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      padding: 24px 20px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 20px;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
@@ -84,48 +80,49 @@
     .quiz-card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0;
-      width: 5px; height: 100%;
-      background: var(--accent);
-      transform: scaleY(0);
-      transition: transform 0.2s ease;
-      transform-origin: bottom;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
-    .quiz-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 4px 6px 0 rgba(192,57,43,0.12); }
-    .quiz-card:hover::before { transform: scaleY(1); }
-    .card-emoji { font-size: 2.2rem; margin-bottom: 10px; }
-    .card-title { font-family: 'Zen Antique Soft', serif; font-size: 1.1rem; margin-bottom: 6px; }
-    .card-meta { font-size: 0.75rem; color: var(--muted); }
+    .quiz-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,111,255,0.15); }
+    .quiz-card:hover::before { opacity: 1; }
+    .card-emoji { font-size: 2rem; margin-bottom: 10px; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+    .card-meta { font-size: 0.73rem; color: var(--muted); }
     .card-badge {
       display: inline-block;
-      background: var(--accent);
-      color: white;
-      font-size: 0.65rem;
-      padding: 2px 8px;
-      border-radius: 2px;
+      font-size: 0.63rem;
+      padding: 3px 10px;
+      border-radius: 20px;
       margin-top: 8px;
-      letter-spacing: 0.1em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      background: rgba(124,111,255,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(124,111,255,0.3);
     }
-    .card-badge.hard { background: var(--ink); }
-    .card-badge.easy { background: #27ae60; }
+    .card-badge.hard { background: rgba(255,107,157,0.15); color: var(--accent2); border-color: rgba(255,107,157,0.3); }
+    .card-badge.easy { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.3); }
 
     /* QUIZ */
     #quiz-page { display: none; }
     .quiz-container { max-width: 680px; margin: 0 auto; padding: 20px 20px 60px; }
     .quiz-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
     .back-btn {
-      background: none;
-      border: 2px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 3px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 20px;
       cursor: pointer;
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
       font-size: 0.8rem;
       color: var(--muted);
       transition: all 0.15s;
     }
-    .back-btn:hover { border-color: var(--ink); color: var(--ink); }
-    .quiz-title-bar { font-family: 'Zen Antique Soft', serif; font-size: 1.1rem; }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .quiz-title-bar { font-size: 1rem; font-weight: 700; }
     .progress-wrap { margin-bottom: 32px; }
     .progress-text { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
     .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
@@ -134,39 +131,41 @@
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       border-radius: 3px;
       transition: width 0.4s ease;
+      box-shadow: 0 0 8px rgba(124,111,255,0.5);
     }
     .question-card {
       background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      padding: 32px 28px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
       margin-bottom: 20px;
     }
-    .question-number { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 12px; font-weight: 700; }
-    .question-text { font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 1.7; font-weight: 700; }
+    .question-number { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.15em; margin-bottom: 12px; font-weight: 700; text-transform: uppercase; }
+    .question-text { font-size: clamp(1rem, 2.5vw, 1.15rem); line-height: 1.7; font-weight: 700; }
     .question-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .question-stat { font-size: 0.72rem; color: var(--muted); background: var(--paper); border: 1px solid var(--border); padding: 2px 8px; border-radius: 10px; }
+    .question-stat { font-size: 0.7rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; }
     .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .choice-btn {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 14px 16px;
       text-align: left;
       cursor: pointer;
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       line-height: 1.5;
       transition: all 0.15s;
       display: flex;
       align-items: flex-start;
       gap: 10px;
+      color: var(--ink);
     }
-    .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: #fff8f0; }
+    .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(124,111,255,0.08); }
     .choice-label { font-weight: 900; color: var(--accent); min-width: 18px; }
-    .choice-btn.correct { border-color: #27ae60; background: #eafaf1; color: #1a6b3a; }
-    .choice-btn.correct .choice-label { color: #27ae60; }
-    .choice-btn.wrong { border-color: var(--accent); background: #fdecea; color: #8b1a0a; }
+    .choice-btn.correct { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
+    .choice-btn.correct .choice-label { color: #34d399; }
+    .choice-btn.wrong { border-color: var(--accent2); background: rgba(255,107,157,0.1); color: var(--accent2); }
     .choice-btn:disabled { cursor: default; }
     .answer-feedback {
       margin-top: 16px;
@@ -177,24 +176,24 @@
       display: none;
     }
     .answer-feedback.show { display: block; }
-    .answer-feedback.correct-fb { background: #eafaf1; border: 1.5px solid #27ae60; color: #1a6b3a; }
-    .answer-feedback.wrong-fb { background: #fdecea; border: 1.5px solid var(--accent); color: #8b1a0a; }
+    .answer-feedback.correct-fb { background: rgba(52,211,153,0.1); border: 1px solid #34d399; color: #34d399; border-radius: 12px; }
+    .answer-feedback.wrong-fb { background: rgba(255,107,157,0.1); border: 1px solid var(--accent2); color: var(--accent2); border-radius: 12px; }
     .next-btn {
       display: none;
       width: 100%;
       margin-top: 20px;
-      background: var(--ink);
-      color: var(--paper);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
       border: none;
       padding: 16px;
-      font-family: 'Zen Antique Soft', serif;
-      font-size: 1rem;
-      letter-spacing: 0.15em;
-      border-radius: 4px;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: opacity 0.15s;
     }
-    .next-btn:hover { background: var(--accent); }
+    .next-btn:hover { opacity: 0.85; }
     .next-btn.show { display: block; }
 
     /* RESULT */
@@ -202,8 +201,8 @@
     .result-container { max-width: 540px; margin: 0 auto; padding: 20px 20px 80px; text-align: center; }
     .result-card {
       background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 4px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
       padding: 48px 32px;
       position: relative;
       overflow: hidden;
@@ -212,33 +211,75 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
     }
-    .result-rank { font-family: 'Zen Antique Soft', serif; font-size: 5rem; color: var(--accent); line-height: 1; margin-bottom: 4px; }
-    .result-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.2em; margin-bottom: 24px; }
+    .result-rank { font-family: 'Inter', sans-serif; font-size: 5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 4px; }
+    .result-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 24px; }
     .result-score { font-size: 2.5rem; font-weight: 900; color: var(--ink); margin-bottom: 4px; }
     .result-score span { font-size: 1rem; color: var(--muted); font-weight: 400; }
-    .result-message { margin-top: 16px; font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+    .result-message { margin-top: 16px; font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
     .result-actions { display: flex; gap: 12px; margin-top: 32px; justify-content: center; flex-wrap: wrap; }
     .result-btn {
       padding: 12px 24px;
-      border-radius: 4px;
-      font-family: 'Zen Antique Soft', serif;
-      font-size: 0.95rem;
-      letter-spacing: 0.1em;
+      border-radius: 12px;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.15s;
-      border: 2px solid var(--ink);
+      border: 1px solid var(--border);
     }
-    .result-btn.primary { background: var(--ink); color: var(--paper); }
-    .result-btn.primary:hover { background: var(--accent); border-color: var(--accent); }
-    .result-btn.secondary { background: transparent; color: var(--ink); }
+    .result-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; }
+    .result-btn.primary:hover { opacity: 0.85; }
+    .result-btn.secondary { background: var(--surface); color: var(--muted); }
     .result-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
 
     @media (max-width: 500px) {
       .choices { grid-template-columns: 1fr; }
     }
+
+    /* TABS */
+    .tab-wrap {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .subtab-wrap {
+      display: none;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .subtab-wrap.show { display: flex; }
+    .subtab-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .subtab-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .subtab-btn.active { background: var(--accent2); color: white; border-color: var(--accent2); }
 
     .search-wrap {
       margin-bottom: 24px;
@@ -247,16 +288,16 @@
     .search-input {
       width: 100%;
       padding: 12px 16px 12px 42px;
-      border: 2px solid var(--border);
-      border-radius: 4px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       background: var(--card);
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
       font-size: 0.95rem;
       color: var(--ink);
-      transition: border-color 0.15s;
+      transition: all 0.15s;
       outline: none;
     }
-    .search-input:focus { border-color: var(--accent); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,111,255,0.15); }
     .search-input::placeholder { color: var(--muted); }
     .search-icon {
       position: absolute;
@@ -279,23 +320,23 @@
     #create-page { display: none; }
     .create-container { max-width: 680px; margin: 0 auto; padding: 20px 20px 60px; }
     .create-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
-    .form-section { background: var(--card); border: 2px solid var(--border); border-radius: 4px; padding: 28px; margin-bottom: 20px; }
-    .form-section-title { font-family: 'Zen Antique Soft', serif; font-size: 1rem; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.1em; }
+    .form-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .form-section-title { font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; }
     .form-row { margin-bottom: 16px; }
     .form-label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.1em; }
     .form-input, .form-select {
       width: 100%;
       padding: 10px 14px;
-      border: 2px solid var(--border);
-      border-radius: 3px;
-      background: var(--paper);
-      font-family: 'Noto Sans JP', sans-serif;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       color: var(--ink);
       outline: none;
       transition: border-color 0.15s;
     }
-    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,111,255,0.15); }
     .question-block { border: 1.5px solid var(--border); border-radius: 3px; padding: 18px; margin-bottom: 12px; background: var(--paper); }
     .question-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .question-block-num { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; }
@@ -338,17 +379,17 @@
       display: inline-block;
       margin-top: 16px;
       padding: 10px 20px;
-      border: 2px solid var(--accent);
-      border-radius: 4px;
-      background: none;
-      color: var(--accent);
-      font-family: 'Zen Antique Soft', serif;
-      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--ink);
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
-      letter-spacing: 0.1em;
     }
-    .create-nav-btn:hover { background: var(--accent); color: white; }
+    .create-nav-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,111,255,0.1); }
     /* SHARE DIALOG */
     .share-dialog-overlay {
       position: fixed;
@@ -421,14 +462,14 @@
       align-items: center;
       gap: 14px;
       background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 4px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 14px 18px;
       margin-bottom: 10px;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .ranking-item:hover { border-color: var(--accent); transform: translateX(4px); }
+    .ranking-item:hover { border-color: var(--accent); transform: translateX(4px); background: var(--surface); }
     .ranking-num {
       font-family: 'Zen Antique Soft', serif;
       font-size: 1.4rem;
@@ -459,32 +500,33 @@
     .rating-btns { display: flex; gap: 12px; justify-content: center; }
     .rating-btn {
       padding: 10px 24px;
-      border-radius: 4px;
-      border: 2px solid var(--border);
-      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.15s;
       font-family: 'Noto Sans JP', sans-serif;
+      color: var(--ink);
     }
     .rating-btn:hover { transform: scale(1.05); }
-    .rating-btn.good:hover, .rating-btn.good.voted { border-color: #27ae60; background: #eafaf1; }
-    .rating-btn.bad:hover, .rating-btn.bad.voted { border-color: var(--accent); background: #fdecea; }
+    .rating-btn.good:hover, .rating-btn.good.voted { border-color: #34d399; background: rgba(52,211,153,0.1); }
+    .rating-btn.bad:hover, .rating-btn.bad.voted { border-color: var(--accent2); background: rgba(255,107,157,0.1); }
     .rating-btn:disabled { cursor: default; transform: none; }
     .share-btn {
       width: 100%;
       padding: 12px;
-      background: #000;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Noto Sans JP', sans-serif;
-      font-size: 0.95rem;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
-      letter-spacing: 0.05em;
+      transition: all 0.15s;
     }
-    .share-btn:hover { background: #333; }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -510,6 +552,19 @@
   </div>
 
   <div class="section-label">クイズを選ぶ</div>
+
+  <div class="tab-wrap">
+    <button class="tab-btn active" onclick="setTab('all')">すべて</button>
+    <button class="tab-btn" onclick="setTab('anime')">アニメ</button>
+    <button class="tab-btn" onclick="setTab('game')">ゲーム</button>
+    <button class="tab-btn" onclick="setTab('other')">その他</button>
+  </div>
+
+  <div class="subtab-wrap" id="subtab-wrap">
+    <button class="subtab-btn active" onclick="setSubTab('official')">公式</button>
+    <button class="subtab-btn" onclick="setSubTab('user')">みんなの投稿</button>
+  </div>
+
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
     <input class="search-input" id="search-input" type="text" placeholder="アニメ名で検索（例：鬼滅、ナルト…）" oninput="filterQuiz()" />
@@ -590,6 +645,14 @@
       <div class="form-row">
         <label class="form-label">絵文字（任意）</label>
         <input class="form-input" id="c-emoji" type="text" placeholder="例：⚔️" maxlength="2" style="max-width:80px;" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">ジャンル</label>
+        <select class="form-select" id="c-genre" style="max-width:160px;">
+          <option value="anime">アニメ</option>
+          <option value="game">ゲーム</option>
+          <option value="other">その他</option>
+        </select>
       </div>
       <div class="form-row">
         <label class="form-label">難易度</label>
@@ -805,7 +868,7 @@ async function submitQuiz() {
   try {
     data = await sbFetch('/rest/v1/quizzes', {
       method: 'POST',
-      body: JSON.stringify({ title, emoji, difficulty, questions, user_id: currentUser ? currentUser.id : null })
+      body: JSON.stringify({ title, emoji, difficulty, questions, user_id: currentUser ? currentUser.id : null, genre: document.getElementById('c-genre').value })
     });
   } catch(e) {
     btn.disabled = false;
@@ -840,7 +903,7 @@ async function submitQuiz() {
 let userQuizzes = [];
 
 async function loadUserQuizzes() {
-  const data = await sbFetch('/rest/v1/quizzes?select=id,title,emoji,difficulty,questions,likes,dislikes,play_count,user_id&order=created_at.desc');
+  const data = await sbFetch('/rest/v1/quizzes?select=id,title,emoji,difficulty,questions,likes,dislikes,play_count,user_id,genre&order=created_at.desc');
   if (Array.isArray(data)) {
     userQuizzes = data.map(q => ({
       id: 'user_' + q.id,
@@ -852,6 +915,7 @@ async function loadUserQuizzes() {
       dislikes: q.dislikes || 0,
       play_count: q.play_count || 0,
       user_id: q.user_id || null,
+      genre: q.genre || 'other',
       isUserQuiz: true
     }));
     renderTop();
@@ -920,7 +984,7 @@ function showToast(msg) {
 
 const quizData = [
   {
-    id: "kimetsu", title: "鬼滅の刃", emoji: "🗡️", difficulty: "normal",
+    id: "kimetsu", genre: "anime", title: "鬼滅の刃", emoji: "🗡️", difficulty: "normal",
     questions: [
       { q: "竈門炭治郎の妹の名前は？", choices: ["禰豆子","カナヲ","アオイ","まこも"], answer: 0, explanation: "竈門禰豆子は炭治郎の妹で、鬼になっても人を食べることを拒否し続けます。" },
       { q: "炭治郎が最終的に使いこなす呼吸法は？", choices: ["水の呼吸","炎の呼吸","日の呼吸（ヒノカミ神楽）","雷の呼吸"], answer: 2, explanation: "炭治郎は「日の呼吸（ヒノカミ神楽）」を使いこなします。" },
@@ -935,7 +999,7 @@ const quizData = [
     ]
   },
   {
-    id: "onepiece", title: "ワンピース", emoji: "☠️", difficulty: "normal",
+    id: "onepiece", genre: "anime", title: "ワンピース", emoji: "☠️", difficulty: "normal",
     questions: [
       { q: "ルフィが食べた悪魔の実は？", choices: ["ゴムゴムの実","メラメラの実","グラグラの実","ニキュニキュの実"], answer: 0, explanation: "ゴムゴムの実を食べたことでルフィの体はゴム人間になりました。" },
       { q: "「海賊王」の称号を持つ人物は？", choices: ["白ひげ","シャンクス","ゴールド・ロジャー","黒ひげ"], answer: 2, explanation: "ゴールド・D・ロジャーが唯一「海賊王」の称号を持ちます。" },
@@ -950,7 +1014,7 @@ const quizData = [
     ]
   },
   {
-    id: "naruto", title: "NARUTO", emoji: "🍃", difficulty: "normal",
+    id: "naruto", genre: "anime", title: "NARUTO", emoji: "🍃", difficulty: "normal",
     questions: [
       { q: "ナルトの体に封印されている尾獣は？", choices: ["八尾","九尾","七尾","一尾"], answer: 1, explanation: "うずまきナルトには「九尾の妖狐（クラマ）」が封印されています。" },
       { q: "うちはサスケの兄の名前は？", choices: ["マダラ","オビト","イタチ","シスイ"], answer: 2, explanation: "うちはイタチはサスケの兄で、木の葉を守るために一族を手にかけました。" },
@@ -965,7 +1029,7 @@ const quizData = [
     ]
   },
   {
-    id: "dragonball", title: "ドラゴンボール", emoji: "🐉", difficulty: "easy",
+    id: "dragonball", genre: "game", title: "ドラゴンボール", emoji: "🐉", difficulty: "easy",
     questions: [
       { q: "悟空の戦闘民族は？", choices: ["ナメック星人","フリーザ一族","サイヤ人","魔人"], answer: 2, explanation: "孫悟空はサイヤ人（カカロット）で、地球に送られました。" },
       { q: "「かめはめ波」を最初に悟空が真似した相手は？", choices: ["亀仙人","ピッコロ","クリリン","神様"], answer: 0, explanation: "亀仙人（武天老師）が使うかめはめ波を悟空が見よう見まねで習得しました。" },
@@ -980,7 +1044,7 @@ const quizData = [
     ]
   },
   {
-    id: "evangelion", title: "エヴァンゲリオン", emoji: "🤖", difficulty: "hard",
+    id: "evangelion", genre: "anime", title: "エヴァンゲリオン", emoji: "🤖", difficulty: "hard",
     questions: [
       { q: "主人公の名前は？", choices: ["碇シンジ","渚カヲル","加持リョウジ","鈴原トウジ"], answer: 0, explanation: "主人公は碇シンジ。ゲンドウの息子でエヴァ初号機のパイロットです。" },
       { q: "エヴァが戦う敵の名称は？", choices: ["エイリアン","使徒","天使","鬼神"], answer: 1, explanation: "エヴァが戦う謎の生命体は「使徒（しと）」と呼ばれます。" },
@@ -995,7 +1059,7 @@ const quizData = [
     ]
   },
   {
-    id: "pokemon", title: "ポケットモンスター", emoji: "⚡", difficulty: "easy",
+    id: "pokemon", genre: "game", title: "ポケットモンスター", emoji: "⚡", difficulty: "easy",
     questions: [
       { q: "ピカチュウのタイプは？", choices: ["ほのお","でんき","みず","くさ"], answer: 1, explanation: "ピカチュウはでんきタイプのポケモンです。" },
       { q: "カントー地方の御三家でないのは？", choices: ["フシギダネ","ヒトカゲ","ミズゴロウ","ゼニガメ"], answer: 2, explanation: "ミズゴロウはホウエン地方（ルビー・サファイア）の御三家です。" },
@@ -1010,7 +1074,7 @@ const quizData = [
     ]
   },
   {
-    id: "jojo", title: "ジョジョの奇妙な冒険", emoji: "👊", difficulty: "normal",
+    id: "jojo", genre: "anime", title: "ジョジョの奇妙な冒険", emoji: "👊", difficulty: "normal",
     questions: [
       { q: "第1部の主人公は？", choices: ["ジョセフ・ジョースター","ジョナサン・ジョースター","空条承太郎","東方仗助"], answer: 1, explanation: "第1部「ファントムブラッド」の主人公はジョナサン・ジョースターです。" },
       { q: "第3部の主人公・空条承太郎のスタンドは？", choices: ["ザ・ワールド","スタープラチナ","クレイジー・ダイヤモンド","ゴールド・エクスペリエンス"], answer: 1, explanation: "承太郎のスタンドは「スタープラチナ」で、精密動作能力と高いパワーが特徴です。" },
@@ -1025,7 +1089,7 @@ const quizData = [
     ]
   },
   {
-    id: "jujutsu", title: "呪術廻戦", emoji: "🔵", difficulty: "normal",
+    id: "jujutsu", genre: "anime", title: "呪術廻戦", emoji: "🔵", difficulty: "normal",
     questions: [
       { q: "主人公・虎杖悠仁の体に宿っている呪いは？", choices: ["両面宿儺","九十九由基","夏油傑","伏黒甚爾"], answer: 0, explanation: "虎杖悠仁の体には「両面宿儺（りょうめんすくな）」の指を取り込んだことで宿っています。" },
       { q: "五条悟の最強技といえば？", choices: ["黒閃","赤","虚式・茈（むらさき）","無量空処"], answer: 3, explanation: "「無量空処」は五条悟の領域展開で、あらゆる情報を強制的に流し込む技です。" },
@@ -1040,7 +1104,7 @@ const quizData = [
     ]
   },
   {
-    id: "haikyuu", title: "ハイキュー！！", emoji: "🏐", difficulty: "normal",
+    id: "haikyuu", genre: "anime", title: "ハイキュー！！", emoji: "🏐", difficulty: "normal",
     questions: [
       { q: "主人公・日向翔陽が所属する高校は？", choices: ["青葉城西高校","烏野高校","音駒高校","梟谷学園"], answer: 1, explanation: "日向翔陽は「烏野高校」バレーボール部に所属しています。" },
       { q: "日向のポジションは？", choices: ["セッター","リベロ","ウイングスパイカー","ミドルブロッカー"], answer: 2, explanation: "日向翔陽はウイングスパイカー（主にライトとして活躍）です。" },
@@ -1055,7 +1119,7 @@ const quizData = [
     ]
   },
   {
-    id: "shingeki", title: "進撃の巨人", emoji: "⚔️", difficulty: "hard",
+    id: "shingeki", genre: "anime", title: "進撃の巨人", emoji: "⚔️", difficulty: "hard",
     questions: [
       { q: "主人公の名前は？", choices: ["アルミン・アルレルト","ライナー・ブラウン","エレン・イェーガー","ジャン・キルシュタイン"], answer: 2, explanation: "主人公はエレン・イェーガー。母を巨人に食べられたことで復讐を誓います。" },
       { q: "人類が暮らす壁の名前（外側から順番）は？", choices: ["マリア→ローゼ→シーナ","シーナ→ローゼ→マリア","ローゼ→マリア→シーナ","マリア→シーナ→ローゼ"], answer: 0, explanation: "外側からウォール・マリア、ウォール・ローゼ、ウォール・シーナの順です。" },
@@ -1067,6 +1131,65 @@ const quizData = [
       { q: "エレンの父・グリシャが持っていた巨人の力は？", choices: ["進撃と始祖","進撃と鎧","進撃と超大型","始祖と鎧"], answer: 0, explanation: "グリシャは「進撃の巨人」と「始祖の巨人」を持っていました。" },
       { q: "壁の外の世界でエルディア人が住む地区は？", choices: ["マーレ地区","パラディ島","レベリオ収容区","解放区"], answer: 2, explanation: "壁外のエルディア人は「レベリオ収容区」に隔離されています。" },
       { q: "「地ならし」とは何？", choices: ["壁内の巨人を解放して外の世界を踏み荒らすこと","巨人を壁の外に放つこと","壁を壊す計画","始祖の巨人の能力で全巨人を消す行為"], answer: 0, explanation: "「地ならし」は壁の中の無垢の巨人を解放し、外の世界を蹂躙するエレンの計画です。" }
+  },
+  {
+    id: "mario", genre: "game", title: "スーパーマリオ", emoji: "🍄", difficulty: "easy",
+    questions: [
+      { q: "マリオの職業は？", choices: ["大工","配管工","料理人","冒険家"], answer: 1, explanation: "マリオは配管工（プランバー）です。" },
+      { q: "マリオが助けるお姫様の名前は？", choices: ["デイジー","ロゼッタ","ピーチ","ワリネ"], answer: 2, explanation: "ピーチ姫がクッパにさらわれるのがお馴染みの展開です。" },
+      { q: "マリオの弟の名前は？", choices: ["ワリオ","ワルイージ","ルイージ","ドンキー"], answer: 2, explanation: "ルイージはマリオの双子の弟です。" },
+      { q: "マリオが大きくなるアイテムは？", choices: ["ファイアフラワー","スーパーキノコ","スター","1UPキノコ"], answer: 1, explanation: "スーパーキノコを取るとマリオが大きくなります。" },
+      { q: "マリオの最大の敵・クッパの種族は？", choices: ["カメ","ノコノコ","テレサ","パックン"], answer: 0, explanation: "クッパはカメ族の大魔王です。" },
+      { q: "マリオカートで最高クラスのレースは？", choices: ["50cc","100cc","150cc","200cc"], answer: 3, explanation: "マリオカート8デラックスでは200ccが最高クラスです。" },
+      { q: "「スーパーマリオブラザーズ」が発売された年は？", choices: ["1983年","1985年","1987年","1990年"], answer: 1, explanation: "1985年にファミコン用ソフトとして発売されました。" },
+      { q: "マリオの帽子に書いてある文字は？", choices: ["M","S","N","L"], answer: 0, explanation: "マリオの赤い帽子には「M」と書かれています。" },
+      { q: "「マリオオデッセイ」でマリオが帽子を投げる理由は？", choices: ["武器として使う","キャッピーという仲間が帽子に宿っているから","帽子で敵を倒すため","コインを集めるため"], answer: 1, explanation: "キャッピーというキャラクターがマリオの帽子に宿り、様々な敵に憑依できます。" },
+      { q: "スーパーマリオで無敵になるアイテムは？", choices: ["ファイアフラワー","スーパーキノコ","スーパースター","タヌキスーツ"], answer: 2, explanation: "スーパースター（点滅する星）を取ると一定時間無敵になります。" }
+    ]
+  },
+  {
+    id: "zelda", genre: "game", title: "ゼルダの伝説", emoji: "🗡️", difficulty: "normal",
+    questions: [
+      { q: "ゼルダの伝説の主人公の名前は？", choices: ["ゼルダ","リンク","ガノン","ナビ"], answer: 1, explanation: "主人公は「リンク」です。ゼルダはお姫様の名前です。" },
+      { q: "リンクが最初に手に入れる剣は？", choices: ["マスターソード","コキリの剣","ギラヒムの剣","大妖精の剣"], answer: 1, explanation: "「時のオカリナ」ではコキリの剣が最初の剣です。" },
+      { q: "「トライフォース」は何個のピースで構成される？", choices: ["2個","3個","4個","6個"], answer: 1, explanation: "トライフォースは「力・知恵・勇気」の3つのピースで構成されます。" },
+      { q: "ガノンドロフが欲しがるトライフォースのピースは？", choices: ["知恵","勇気","力","全部"], answer: 2, explanation: "ガノンドロフは「力のトライフォース」を持ち、残り全てを狙います。" },
+      { q: "「時のオカリナ」でリンクが7年後に目覚める場所は？", choices: ["ハイラル城","時の神殿","デスマウンテン","ゾーラの里"], answer: 1, explanation: "リンクは時の神殿のマスターソードを抜いて7年間眠り続けます。" },
+      { q: "「ブレスオブザワイルド」の舞台は？", choices: ["ハイラル王国","テルミナ","ホロドラム","ラウル"], answer: 0, explanation: "ブレスオブザワイルドはハイラル王国を舞台にしたオープンワールドゲームです。" },
+      { q: "リンクの妖精の仲間（時のオカリナ）の名前は？", choices: ["ミドナ","ナビ","ファイ","タッタ"], answer: 1, explanation: "「ナビ」はリンクに同行する妖精で「ヘイ！リッスン！」が口癖です。" },
+      { q: "ゼルダの伝説シリーズを生み出した会社は？", choices: ["セガ","任天堂","スクウェア","カプコン"], answer: 1, explanation: "ゼルダの伝説は任天堂が開発・発売するゲームシリーズです。" },
+      { q: "「神々のトライフォース」でリンクが冒険するもう一つの世界は？", choices: ["影の世界","闇の世界","鏡の世界","夢の世界"], answer: 1, explanation: "「神々のトライフォース」では「闇の世界」が舞台の一つです。" },
+      { q: "「ティアーズオブザキングダム」で新たに登場したリンクの能力は？", choices: ["時を戻す","空を飛ぶ","物を作る「スクラビルド」","テレポート"], answer: 2, explanation: "スクラビルドはアイテムを組み合わせて新しい武器や道具を作る能力です。" }
+    ]
+  },
+  {
+    id: "splatoon", genre: "game", title: "スプラトゥーン", emoji: "🦑", difficulty: "easy",
+    questions: [
+      { q: "スプラトゥーンの主人公の種族は？", choices: ["人間","タコ","イカ","クラゲ"], answer: 2, explanation: "主人公はイカ人間「インクリング」です。" },
+      { q: "スプラトゥーンの基本ルールは？", choices: ["敵を倒す","地面をインクで塗る","旗を取る","城を壊す"], answer: 1, explanation: "地面をインクで多く塗ったチームが勝利するのが基本ルールです。" },
+      { q: "スプラトゥーンの開発会社は？", choices: ["任天堂","ソニー","カプコン","セガ"], answer: 0, explanation: "スプラトゥーンは任天堂が開発したゲームです。" },
+      { q: "スプラトゥーンでインクに潜れる形態は？", choices: ["人間形態","イカ形態","タコ形態","クラゲ形態"], answer: 1, explanation: "イカ形態になるとインクの中を高速で泳いだり潜ったりできます。" },
+      { q: "スプラトゥーン3の新マップ「バンカラ街」の特徴は？", choices: ["水中にある","廃墟のような街並み","空中に浮いている","砂漠の中にある"], answer: 1, explanation: "バンカラ街は廃墟のような荒廃した街並みが特徴のロビーエリアです。" },
+      { q: "スプラトゥーンのサーモンランとは？", choices: ["PvPバトル","協力プレイモード","ストーリーモード","ランキングバトル"], answer: 1, explanation: "サーモンランは最大4人で協力してシャケを倒す協力プレイモードです。" },
+      { q: "スプラトゥーン2で登場したキャラクター「ヒメ」の相方は？", choices: ["イイダ","アオリ","ホタル","ウタ"], answer: 0, explanation: "ヒメとイイダはスプラトゥーン2のアイドルデュオ「テンタクルズ」です。" },
+      { q: "スプラトゥーンでイカになれないエリアは？", choices: ["敵のインク","水の中","高い壁","天井"], answer: 1, explanation: "水の中に入るとダメージを受けてしまいます。" },
+      { q: "スプラトゥーン3のストーリーモードの敵は？", choices: ["シャケ","タコ族","クマサン商会","ゾンビ"], answer: 2, explanation: "スプラトゥーン3のストーリーモードではクマサン商会と戦います。" },
+      { q: "スプラトゥーンシリーズが初めて発売された年は？", choices: ["2013年","2015年","2017年","2019年"], answer: 1, explanation: "初代スプラトゥーンは2015年にWii Uで発売されました。" }
+    ]
+  },
+  {
+    id: "monhun", genre: "game", title: "モンスターハンター", emoji: "🐉", difficulty: "normal",
+    questions: [
+      { q: "モンスターハンターの主人公の職業は？", choices: ["冒険家","ハンター","騎士","魔法使い"], answer: 1, explanation: "プレイヤーはハンターとなってモンスターを狩るのが基本です。" },
+      { q: "モンハンで素材を集める主な方法は？", choices: ["店で買う","モンスターを狩る・捕獲する","採掘する","釣りをする"], answer: 1, explanation: "モンスターを倒すか捕獲することで素材を入手し、武器や防具を作ります。" },
+      { q: "モンハンの近接武器で最も種類が多いのは？", choices: ["片手剣","大剣","双剣","ランス"], answer: 0, explanation: "片手剣は取り回しがよくモンハン初心者にも人気の武器です（実際は全14種類）。" },
+      { q: "「モンスターハンターワールド」で初登場した大型モンスターは？", choices: ["ナルガクルガ","ネルギガンテ","ティガレックス","ジンオウガ"], answer: 1, explanation: "ネルギガンテはモンスターハンターワールドで初登場した看板モンスターです。" },
+      { q: "モンハンでモンスターを捕まえるために使うアイテムは？", choices: ["ハナアミ","落とし穴＋シビレ罠＋捕獲用麻酔玉","ネット","鉄の檻"], answer: 1, explanation: "モンスターを弱らせてから罠にはめ、捕獲用麻酔玉を当てて捕獲します。" },
+      { q: "「モンスターハンターライズ」の新アクション「翔蟲」の特徴は？", choices: ["空を飛べる","壁を走れる","水中を泳げる","地中に潜れる"], answer: 1, explanation: "翔蟲を使うことで壁走りや高所への移動など、立体的なアクションが可能になりました。" },
+      { q: "モンハンの「古龍」とは？", choices: ["最も古いモンスター","生態系の頂点に立つ特別なモンスター","龍属性のモンスター","伝説のモンスター"], answer: 1, explanation: "古龍は通常の生態系に属さない特別なモンスターの分類です。" },
+      { q: "モンハンシリーズを開発・発売しているのは？", choices: ["任天堂","バンダイナムコ","カプコン","スクウェア・エニックス"], answer: 2, explanation: "モンスターハンターシリーズはカプコンが開発・発売しています。" },
+      { q: "モンハンで4人で協力プレイすることを何という？", choices: ["マルチプレイ","集会所クエスト","協力ハント","チームハント"], answer: 1, explanation: "集会所クエストでは最大4人でオンライン協力プレイが楽しめます。" },
+      { q: "「モンスターハンター：ワールド」が発売された年は？", choices: ["2016年","2018年","2020年","2022年"], answer: 1, explanation: "モンスターハンター：ワールドは2018年に発売され世界的な大ヒットになりました。" }
     ]
   }
 ];
@@ -1338,27 +1461,64 @@ https://animechan8765.github.io/anime-quiz/`;
   window.open(url, '_blank');
 }
 
+let currentTab = 'all';
+let currentSubTab = 'official';
+
+function setTab(tab) {
+  currentTab = tab;
+  currentSubTab = 'official';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const subtabWrap = document.getElementById('subtab-wrap');
+  if (tab !== 'all') {
+    subtabWrap.classList.add('show');
+    document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.subtab-btn')[0].classList.add('active');
+  } else {
+    subtabWrap.classList.remove('show');
+  }
+  filterQuiz();
+}
+
+function setSubTab(subtab) {
+  currentSubTab = subtab;
+  document.querySelectorAll('.subtab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  filterQuiz();
+}
+
 function filterQuiz() {
   const word = document.getElementById('search-input').value.trim().toLowerCase();
   const grid = document.getElementById('quiz-grid');
   const noResults = document.getElementById('no-results');
   const noResultsWord = document.getElementById('no-results-word');
 
-  const allQuizzes = [...quizData, ...userQuizzes];
-  const filtered = allQuizzes.filter(q => q.title.toLowerCase().includes(word));
+  let quizzes = [...quizData, ...userQuizzes];
+
+  if (currentTab !== 'all') {
+    quizzes = quizzes.filter(q => q.genre === currentTab);
+    if (currentSubTab === 'official') {
+      quizzes = quizzes.filter(q => !q.isUserQuiz);
+    } else {
+      quizzes = quizzes.filter(q => q.isUserQuiz);
+    }
+  }
+
+  const filtered = word ? quizzes.filter(q => q.title.toLowerCase().includes(word)) : quizzes;
 
   if (filtered.length === 0) {
     grid.innerHTML = '';
-    noResultsWord.textContent = word;
+    noResultsWord.textContent = word || currentTab;
     noResults.style.display = 'block';
   } else {
     noResults.style.display = 'none';
     grid.innerHTML = filtered.map(q => `
       <div class="quiz-card" onclick="startQuiz('${q.id}')">
         <div class="card-emoji">${q.emoji}</div>
-        <div class="card-title">${q.title}</div>
-        <div class="card-meta">${q.questions.length}問</div>
+        <div class="card-title">${q.title}${q.isUserQuiz ? ' <span style=\"font-size:0.6rem;background:rgba(124,111,255,0.15);color:var(--accent);padding:1px 6px;border-radius:4px;vertical-align:middle;\">投稿</span>' : ''}</div>
+        <div class="card-meta">${q.questions.length}問${q.isUserQuiz && q.play_count ? ' · ' + q.play_count + '回プレイ' : ''}</div>
         <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
+        ${q.isUserQuiz && currentUser && q.user_id === currentUser.id ? `<button onclick="event.stopPropagation();deleteQuiz('${q.id}')" style="margin-top:8px;background:none;border:1px solid var(--accent);color:var(--accent);font-size:0.7rem;padding:2px 8px;border-radius:4px;cursor:pointer;">🗑 削除</button>` : ''}
       </div>
     `).join('');
   }

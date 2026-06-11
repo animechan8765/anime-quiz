@@ -4,22 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>みんなのクイズパーク</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #f0f0f5;
-      --paper: #0d0d14;
-      --accent: #7c6fff;
-      --accent2: #ff6b9d;
-      --gold: #ffd700;
-      --muted: #6b6b8a;
-      --card: #16161f;
-      --border: #2a2a3a;
-      --surface: #1e1e2e;
+      --ink: #2d2417;
+      --paper: #fdf8f2;
+      --accent: #e8640c;
+      --accent2: #d4a017;
+      --gold: #d4a017;
+      --muted: #9c8b78;
+      --card: #ffffff;
+      --border: #e8ddd0;
+      --surface: #f5ede3;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       background-color: var(--paper);
       color: var(--ink);
       min-height: 100vh;
@@ -27,18 +27,19 @@
     header {
       text-align: center;
       padding: 48px 20px 28px;
-      background: linear-gradient(180deg, #0d0d14 0%, #13131e 100%);
+      background: linear-gradient(180deg, #fff8f0 0%, #fdf8f2 100%);
       border-bottom: 1px solid var(--border);
     }
     .site-title {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Nunito', sans-serif;
       font-size: clamp(2rem, 6vw, 3.2rem);
       font-weight: 900;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #7c6fff 0%, #ff6b9d 100%);
+      letter-spacing: 0.01em;
+      background: linear-gradient(135deg, #e8640c 0%, #d4a017 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(232,100,12,0.2));
     }
     .site-subtitle {
       font-size: 0.75rem;
@@ -86,7 +87,7 @@
       opacity: 0;
       transition: opacity 0.2s ease;
     }
-    .quiz-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,111,255,0.15); }
+    .quiz-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(232,100,12,0.12); }
     .quiz-card:hover::before { opacity: 1; }
     .card-emoji { font-size: 2rem; margin-bottom: 10px; }
     .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
@@ -99,12 +100,12 @@
       margin-top: 8px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      background: rgba(124,111,255,0.15);
+      background: rgba(232,100,12,0.1);
       color: var(--accent);
-      border: 1px solid rgba(124,111,255,0.3);
+      border: 1px solid rgba(232,100,12,0.25);
     }
-    .card-badge.hard { background: rgba(255,107,157,0.15); color: var(--accent2); border-color: rgba(255,107,157,0.3); }
-    .card-badge.easy { background: rgba(52,211,153,0.15); color: #34d399; border-color: rgba(52,211,153,0.3); }
+    .card-badge.hard { background: rgba(212,160,23,0.15); color: #b8860b; border-color: rgba(212,160,23,0.3); }
+    .card-badge.easy { background: rgba(34,197,94,0.12); color: #16a34a; border-color: rgba(34,197,94,0.25); }
 
     /* QUIZ */
     #quiz-page { display: none; }
@@ -116,7 +117,7 @@
       padding: 6px 16px;
       border-radius: 20px;
       cursor: pointer;
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.8rem;
       color: var(--muted);
       transition: all 0.15s;
@@ -131,7 +132,7 @@
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       border-radius: 3px;
       transition: width 0.4s ease;
-      box-shadow: 0 0 8px rgba(124,111,255,0.5);
+      box-shadow: 0 0 8px rgba(232,100,12,0.3);
     }
     .question-card {
       background: var(--card);
@@ -152,7 +153,7 @@
       padding: 14px 16px;
       text-align: left;
       cursor: pointer;
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       line-height: 1.5;
       transition: all 0.15s;
@@ -161,11 +162,11 @@
       gap: 10px;
       color: var(--ink);
     }
-    .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(124,111,255,0.08); }
+    .choice-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(232,100,12,0.06); }
     .choice-label { font-weight: 900; color: var(--accent); min-width: 18px; }
-    .choice-btn.correct { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
-    .choice-btn.correct .choice-label { color: #34d399; }
-    .choice-btn.wrong { border-color: var(--accent2); background: rgba(255,107,157,0.1); color: var(--accent2); }
+    .choice-btn.correct { border-color: #16a34a; background: rgba(34,197,94,0.08); color: #15803d; }
+    .choice-btn.correct .choice-label { color: #16a34a; }
+    .choice-btn.wrong { border-color: #dc2626; background: rgba(220,38,38,0.06); color: #dc2626; }
     .choice-btn:disabled { cursor: default; }
     .answer-feedback {
       margin-top: 16px;
@@ -176,17 +177,17 @@
       display: none;
     }
     .answer-feedback.show { display: block; }
-    .answer-feedback.correct-fb { background: rgba(52,211,153,0.1); border: 1px solid #34d399; color: #34d399; border-radius: 12px; }
-    .answer-feedback.wrong-fb { background: rgba(255,107,157,0.1); border: 1px solid var(--accent2); color: var(--accent2); border-radius: 12px; }
+    .answer-feedback.correct-fb { background: rgba(34,197,94,0.08); border: 1px solid #16a34a; color: #15803d; border-radius: 12px; }
+    .answer-feedback.wrong-fb { background: rgba(220,38,38,0.06); border: 1px solid #dc2626; color: #dc2626; border-radius: 12px; }
     .next-btn {
       display: none;
       width: 100%;
       margin-top: 20px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      background: linear-gradient(135deg, #e8640c, #d4a017);
       color: white;
       border: none;
       padding: 16px;
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.95rem;
       font-weight: 700;
       border-radius: 12px;
@@ -214,7 +215,7 @@
       height: 4px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
     }
-    .result-rank { font-family: 'Inter', sans-serif; font-size: 5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 4px; }
+    .result-rank { font-family: 'Inter', sans-serif; font-size: 5rem; font-weight: 900; background: linear-gradient(135deg, #e8640c, #d4a017); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 4px; }
     .result-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 24px; }
     .result-score { font-size: 2.5rem; font-weight: 900; color: var(--ink); margin-bottom: 4px; }
     .result-score span { font-size: 1rem; color: var(--muted); font-weight: 400; }
@@ -223,7 +224,7 @@
     .result-btn {
       padding: 12px 24px;
       border-radius: 12px;
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
@@ -252,14 +253,14 @@
       border: 1px solid var(--border);
       background: var(--card);
       color: var(--muted);
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
     }
     .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 12px rgba(232,100,12,0.2); }
     .subtab-wrap {
       display: none;
       gap: 8px;
@@ -272,14 +273,14 @@
       border: 1px solid var(--border);
       background: transparent;
       color: var(--muted);
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s;
     }
     .subtab-btn:hover { border-color: var(--accent2); color: var(--accent2); }
-    .subtab-btn.active { background: var(--accent2); color: white; border-color: var(--accent2); }
+    .subtab-btn.active { background: #d4a017; color: white; border-color: #d4a017; }
 
     .search-wrap {
       margin-bottom: 24px;
@@ -291,13 +292,13 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--card);
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.95rem;
       color: var(--ink);
       transition: all 0.15s;
       outline: none;
     }
-    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,111,255,0.15); }
+    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,100,12,0.1); }
     .search-input::placeholder { color: var(--muted); }
     .search-icon {
       position: absolute;
@@ -330,13 +331,13 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--surface);
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       color: var(--ink);
       outline: none;
       transition: border-color 0.15s;
     }
-    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,111,255,0.15); }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,100,12,0.1); }
     .question-block { border: 1.5px solid var(--border); border-radius: 3px; padding: 18px; margin-bottom: 12px; background: var(--paper); }
     .question-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .question-block-num { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; }
@@ -383,7 +384,7 @@
       border-radius: 20px;
       background: var(--surface);
       color: var(--ink);
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
@@ -520,7 +521,7 @@
       color: var(--ink);
       border: 1px solid var(--border);
       border-radius: 12px;
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
@@ -1516,7 +1517,7 @@ function filterQuiz() {
     grid.innerHTML = filtered.map(q => `
       <div class="quiz-card" onclick="startQuiz('${q.id}')">
         <div class="card-emoji">${q.emoji}</div>
-        <div class="card-title">${q.title}${q.isUserQuiz ? ' <span style=\"font-size:0.6rem;background:rgba(124,111,255,0.15);color:var(--accent);padding:1px 6px;border-radius:4px;vertical-align:middle;\">投稿</span>' : ''}</div>
+        <div class="card-title">${q.title}${q.isUserQuiz ? ' <span style=\"font-size:0.6rem;background:rgba(232,100,12,0.1);color:var(--accent);padding:1px 6px;border-radius:4px;vertical-align:middle;\">投稿</span>' : ''}</div>
         <div class="card-meta">${q.questions.length}問${q.isUserQuiz && q.play_count ? ' · ' + q.play_count + '回プレイ' : ''}</div>
         <div class="card-badge ${q.difficulty}">${q.difficulty === 'easy' ? '初級' : q.difficulty === 'hard' ? '上級' : '中級'}</div>
         ${q.isUserQuiz && currentUser && q.user_id === currentUser.id ? `<button onclick="event.stopPropagation();deleteQuiz('${q.id}')" style="margin-top:8px;background:none;border:1px solid var(--accent);color:var(--accent);font-size:0.7rem;padding:2px 8px;border-radius:4px;cursor:pointer;">🗑 削除</button>` : ''}
